@@ -23,14 +23,11 @@ FText UStateMachineGraphNode_State::GetNodeTitle(ENodeTitleType::Type TitleType)
 	const UStateData* myState = Cast<UStateData>(NodeInstance);
 	if (myState != NULL)
 	{
+		if (myState->StateName == "")
+		{
+			return FText::FromString(ClassData.GetClassName());
+		}
 		return FText::FromString(myState->StateName);
-	}
-	else if (!ClassData.GetClassName().IsEmpty())
-	{
-		FString StoredClassName = ClassData.GetClassName();
-		StoredClassName.RemoveFromEnd(TEXT("_C"));
-
-		return FText::Format(NSLOCTEXT("AIGraph", "NodeClassError", "Class {0} not found, make sure it's saved!"), FText::FromString(StoredClassName));
 	}
 
 	return Super::GetNodeTitle(TitleType);

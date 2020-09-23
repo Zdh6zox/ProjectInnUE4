@@ -74,6 +74,10 @@ protected:
 
 	/** The node body widget, cached here so we can determine its size when we want ot position our overlays */
 	TSharedPtr<SBorder> NodeBody;
+
+	FReply ToggleDetailDisplay();
+
+	EVisibility GetDetailVisibility() const;
 };
 
 class SStateMachinePin : public SGraphPinAI

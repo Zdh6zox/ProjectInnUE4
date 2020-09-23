@@ -12,6 +12,9 @@
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SSeparator.h"
+#include "Widgets/Layout/SGridPanel.h"
+#include "Widgets/Input/SButton.h"
 #include "Widgets/SToolTip.h"
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "SGraphPanel.h"
@@ -19,6 +22,8 @@
 #include "NodeFactory.h"
 #include "Data/State/TransitionData.h"
 
+
+#define LOCTEXT_NAMESPACE "SGraphStateMachineNode"
 
 void SStateMachinePin::Construct(const FArguments& InArgs, UEdGraphPin* InPin)
 {
@@ -162,19 +167,54 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 	const FMargin NodePadding = FMargin(2.0f);
 	this->ContentScale.Bind(this, &SGraphNode::GetContentScale);
 
-	if (bIsTransNode)
+	//if (bIsTransNode)
+	//{
+	//	this->GetOrAddSlot(ENodeZone::Center)
+	//		.HAlign(HAlign_Fill)
+	//		.VAlign(VAlign_Center)
+	//	[
+	//		SNew(SImage)
+	//		.Image(FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon")))
+	//	];
+
+	//	CreatePinWidgets();
+	//	return;
+	//}
+
+	if (bIsActionNode && bIsLogicNode)
 	{
 		this->GetOrAddSlot(ENodeZone::Center)
 			.HAlign(HAlign_Fill)
 			.VAlign(VAlign_Center)
-		[
-			SNew(SImage)
-			.Image(FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon")))
-		];
+			[
+				SNew(SBorder)
+				.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+				.Padding(0.0f)
+				.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
+				.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+				[
+					SNew(SVerticalBox)
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					[
+						SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+						.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+						.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+						.OnVerifyTextChanged(this, &SGraphNode_StateMachine::OnVerifyNameTextChanged)
+						.OnTextCommitted(this, &SGraphNode_StateMachine::OnNameTextCommited)
+						.IsReadOnly(this, &SGraphNode_StateMachine::IsNameReadOnly)
+						.IsSelected(this, &SGraphNode_StateMachine::IsSelectedExclusively)
+					]
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.HAlign(HAlign_Center)
+					[
+						NodeTitle.ToSharedRef()
+					]
+				]
+			];
 
-		UStateMachineGraphNode_Transition* transNode = Cast<UStateMachineGraphNode_Transition>(GraphNode);
-		UTransitionData* transData = Cast<UTransitionData>(transNode->NodeInstance);
-		return;
+	    return;
 	}
 
 	this->GetOrAddSlot(ENodeZone::Center)
@@ -187,171 +227,187 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 		    .BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
 		    .OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
 		    [
-				SNew(SOverlay)
+				SNew(SHorizontalBox)
 
-				// Pins and node details
-		        + SOverlay::Slot()
-		        .HAlign(HAlign_Fill)
-		        .VAlign(VAlign_Fill)
+				+ SHorizontalBox::Slot()
+		        .AutoWidth()
+				.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+				[
+					SNew(SBorder)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Top)
+					[
+						SNew(SBorder)
+						.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+						.Padding(0.0f)
+						.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
+						.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+						.Visibility(this, &SGraphNode_StateMachine::GetDetailVisibility)
+						[
+							EnterActionsBox.ToSharedRef()
+						]
+					]
+				]
+
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+                .Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
 		        [
-					SNew(SVerticalBox)
-					// INPUT PIN AREA
-					+SVerticalBox::Slot()
-					.AutoHeight()
-		            [
-			            SNew(SBox)
-			            .MinDesiredHeight(NodePadding.Top)
-		                [
-			                SAssignNew(LeftNodeBox, SVerticalBox)
-		                ]
-		            ]
+					SNew(SOverlay)
 
-	                //Name
-	                + SVerticalBox::Slot()
-		            .Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+					// Pins and node details
+					+ SOverlay::Slot()
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Fill)
 					[
 						SNew(SVerticalBox)
+						// INPUT PIN AREA
 						+ SVerticalBox::Slot()
-                        .AutoHeight()
+						.AutoHeight()
 						[
-							SAssignNew(NodeBody, SBorder)
-							.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-						    .BorderBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.1f))
-						    .HAlign(HAlign_Fill)
-						    .VAlign(VAlign_Center)
-						    .Visibility(EVisibility::SelfHitTestInvisible)
-						    [
-								SNew(SOverlay)
-								+ SOverlay::Slot()
-		                        .HAlign(HAlign_Fill)
-		                        .VAlign(VAlign_Fill)
-		                        [
-			                        SNew(SVerticalBox)
-									+ SVerticalBox::Slot()
-		                            .AutoHeight()
-		                           [
-			                           SNew(SHorizontalBox)
-									   + SHorizontalBox::Slot()
-		                               .AutoWidth()
-		                               [
-										   SNew(SLevelOfDetailBranchNode)
-										   .UseLowDetailSlot(false)
-		                                   .LowDetail()
-		                                   [
-											   SNew(SBox)
-											   .WidthOverride_Lambda(GetNodeTitlePlaceholderWidth)
-		                                       .HeightOverride_Lambda(GetNodeTitlePlaceholderHeight)
-										   ]
-	                                       .HighDetail()
-										   [
-											   SNew(SHorizontalBox)
-											   //+ SHorizontalBox::Slot()
-											   //.AutoWidth()
-											   //.VAlign(VAlign_Center)
-											   //[
-												  // SNew(SImage)
-												  // .Image(this, &SGraphNode_BehaviorTree::GetNameIcon)
-											   //]
-										       + SHorizontalBox::Slot()
-											   .Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
-											   [
-												   SNew(SVerticalBox)
-												   + SVerticalBox::Slot()
-											       .AutoHeight()
-											       [
-												       SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-												       .Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
-											           .Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-											           .OnVerifyTextChanged(this, &SGraphNode_StateMachine::OnVerifyNameTextChanged)
-											           .OnTextCommitted(this, &SGraphNode_StateMachine::OnNameTextCommited)
-											           .IsReadOnly(this, &SGraphNode_StateMachine::IsNameReadOnly)
-											           .IsSelected(this, &SGraphNode_StateMachine::IsSelectedExclusively)
-											       ]
-										           + SVerticalBox::Slot()
-											       .AutoHeight()
-											       [
-												       NodeTitle.ToSharedRef()
-											       ]
-											   ]
-										   ]
-									   ]
-								   ]
-							    ]
+							SNew(SBox)
+							.MinDesiredHeight(NodePadding.Top)
+							[
+								SAssignNew(LeftNodeBox, SVerticalBox)
+							]
+						]
+
+						//Name
+						+ SVerticalBox::Slot()
+						.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+						[
+							SNew(SVerticalBox)
+							+ SVerticalBox::Slot()
+							.AutoHeight()
+							[
+								SAssignNew(NodeBody, SBorder)
+								.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
+								.BorderBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.1f))
+								.HAlign(HAlign_Fill)
+								.VAlign(VAlign_Center)
+								.Visibility(EVisibility::SelfHitTestInvisible)
+								[
+									SNew(SOverlay)
+									+ SOverlay::Slot()
+									.HAlign(HAlign_Fill)
+									.VAlign(VAlign_Fill)
+									[
+										SNew(SGridPanel)
+										
+										+SGridPanel::Slot(0,0)
+										[
+											SNew(SVerticalBox)
+											+ SVerticalBox::Slot()
+											.AutoHeight()
+											[
+												SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+												.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+												.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+												.OnVerifyTextChanged(this, &SGraphNode_StateMachine::OnVerifyNameTextChanged)
+												.OnTextCommitted(this, &SGraphNode_StateMachine::OnNameTextCommited)
+												.IsReadOnly(this, &SGraphNode_StateMachine::IsNameReadOnly)
+												.IsSelected(this, &SGraphNode_StateMachine::IsSelectedExclusively)
+											]
+											+ SVerticalBox::Slot()
+											.AutoHeight()
+											.HAlign(HAlign_Center)
+											[
+												NodeTitle.ToSharedRef()
+											]
+										]
+
+										+SGridPanel::Slot(1,0)
+										[
+											SNew(SBox)
+											.MaxDesiredWidth(20)
+											[
+												SNew(SButton)
+												.VAlign(VAlign_Center)
+												.HAlign(HAlign_Center)
+												.Text(LOCTEXT("SGraphStateMachineNode", "D"))
+												.ToolTipText(LOCTEXT("SGraphStateMachineNode", "Toggle Details Of this State"))
+												.Visibility(bIsStateNode ? EVisibility::Visible : EVisibility::Collapsed)
+												.OnClicked(this, &SGraphNode_StateMachine::ToggleDetailDisplay)
+											]
+										]
+									]
+								]
+							]
+						]
+						// OUTPUT PIN AREA
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							SNew(SBox)
+							.MinDesiredHeight(NodePadding.Bottom)
+							[
+								SAssignNew(RightNodeBox, SVerticalBox)
+								+ SVerticalBox::Slot()
+								.HAlign(HAlign_Fill)
+								.VAlign(VAlign_Fill)
+								//.Padding(20.0f, 0.0f)
+								.FillHeight(1.0f)
+								[
+									SAssignNew(OutputPinBox, SHorizontalBox)
+								]
+							]
+						]
+
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+						[
+							SNew(SBorder)
+							.HAlign(HAlign_Fill)
+							.VAlign(VAlign_Top)
+							[
+								SNew(SBorder)
+								.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+								.Padding(0.0f)
+								.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
+								.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+								.Visibility(this, &SGraphNode_StateMachine::GetDetailVisibility)
+								[
+									LogicsBox.ToSharedRef()
+								]
 							]
 						]
 					]
-		            // OUTPUT PIN AREA
-		            + SVerticalBox::Slot()
-			        .AutoHeight()
-			        [
-				       SNew(SBox)
-				       .MinDesiredHeight(NodePadding.Bottom)
-			           [
-				            SAssignNew(RightNodeBox, SVerticalBox)
-						    + SVerticalBox::Slot()
-						    .HAlign(HAlign_Fill)
-						    .VAlign(VAlign_Fill)
-						    //.Padding(20.0f, 0.0f)
-						    .FillHeight(1.0f)
-						    [
-							     SAssignNew(OutputPinBox, SHorizontalBox)
-						    ]
-			           ]
-				   ]
-				]
 
-				// Drag marker overlay
-				+ SOverlay::Slot()
-			    .HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-					.BorderBackgroundColor(FLinearColor(1.0f, 1.0f, 0.2f))
-					.ColorAndOpacity(FLinearColor(1.0f, 1.0f, 0.2f))
-					.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-					.Visibility(this,&SGraphNode_StateMachine::GetDragOverMarkerVisibility)
-					[
-						SNew(SBox)
-						.HeightOverride(4)
-					]
-				]
-				+SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-					.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
-					.Padding(0.0f)
-					.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
-					.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
-					[
-						EnterActionsBox.ToSharedRef()
-					]
-				]
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-					.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
-					.Padding(0.0f)
-					.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
-					.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
-					[
-						ExitActionsBox.ToSharedRef()
-					]
-				]
-				+ SOverlay::Slot()
+					// Drag marker overlay
+					+ SOverlay::Slot()
 					.HAlign(HAlign_Fill)
 					.VAlign(VAlign_Top)
+					[
+						SNew(SBorder)
+						.BorderBackgroundColor(FLinearColor(1.0f, 1.0f, 0.2f))
+						.ColorAndOpacity(FLinearColor(1.0f, 1.0f, 0.2f))
+						.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
+						.Visibility(this, &SGraphNode_StateMachine::GetDragOverMarkerVisibility)
+						[
+							SNew(SBox)
+							.HeightOverride(4)
+						]
+					]
+				]
+				
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
 				[
 					SNew(SBorder)
-					.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
-					.Padding(0.0f)
-					.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
-					.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Top)
 					[
-						LogicsBox.ToSharedRef()
+						SNew(SBorder)
+						.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+						.Padding(0.0f)
+						.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
+						.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+						.Visibility(this,&SGraphNode_StateMachine::GetDetailVisibility)
+						[
+							ExitActionsBox.ToSharedRef()
+						]
 					]
 				]
 			]
@@ -375,6 +431,17 @@ void SGraphNode_StateMachine::CreatePinWidgets()
 			AddPin(NewPin.ToSharedRef());
 		}
 	}
+}
+
+EVisibility SGraphNode_StateMachine::GetDetailVisibility() const
+{
+	UStateMachineGraphNode_State* stateNode = Cast<UStateMachineGraphNode_State>(GraphNode);
+	if (stateNode != NULL)
+	{
+		return stateNode->DetailDisplayed ? EVisibility::Visible : EVisibility::Collapsed;
+	}
+
+	return EVisibility::Collapsed;
 }
 
 EVisibility SGraphNode_StateMachine::GetNameVisibility() const
@@ -529,8 +596,21 @@ void SGraphNode_StateMachine::AddLogic(TSharedPtr<SGraphNode> LogicWidget)
 	AddSubNode(LogicWidget);
 }
 
+FReply SGraphNode_StateMachine::ToggleDetailDisplay()
+{
+	UStateMachineGraphNode_State* stateNode = Cast<UStateMachineGraphNode_State>(GraphNode);
+	if (stateNode != NULL)
+	{
+		stateNode->DetailDisplayed = !stateNode->DetailDisplayed;
+	}
+
+	return FReply::Handled();
+}
+
 //void SGraphNode_StateMachine::AddTransition(TSharedPtr<SGraphNode> TransWidget)
 //{
 //	TransWidgets.Add(TransWidget);
 //	AddSubNode(TransWidget);
 //}
+
+#undef LOCTEXT_NAMESPACE

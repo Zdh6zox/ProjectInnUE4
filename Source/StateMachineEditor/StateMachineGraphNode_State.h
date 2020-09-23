@@ -17,6 +17,9 @@ class STATEMACHINEEDITORMODULE_API UStateMachineGraphNode_State : public UStateM
 	GENERATED_UCLASS_BODY()
 	
 public:
+	UPROPERTY()
+	bool DetailDisplayed = false;
+
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	/** Gets a list of actions that can be done to this particular node */
