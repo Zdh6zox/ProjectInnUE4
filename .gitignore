@@ -2,3 +2,5 @@
 /Intermediate/*
 /Saved/*
 /Content/StarterContent/*
+/.vs/*
+*.sln
