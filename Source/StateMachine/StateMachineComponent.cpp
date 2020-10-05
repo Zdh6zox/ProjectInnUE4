@@ -29,6 +29,7 @@ void UStateMachineComponent::BeginPlay()
 
 	if (m_ActiveState.IsValid())
 	{
+		m_ActiveState.Pin()->InitContext(this);
 		m_ActiveState.Pin()->EnterState();
 	}
 	//// ...

@@ -26,7 +26,7 @@ void FFindTableAndSetAction::Execute(TWeakPtr<FActionExecutionContext> ctx)
 
 	UStateMachineComponent* owner = ctx.Pin()->ExecuterComponent;
 	ACustomer* customer = Cast<ACustomer>(owner->GetOwner());
-	UBlackboardComponent* bbComp = customer->FindComponentByClass<UBlackboardComponent>();
+	UBlackboardComponent* bbComp = customer->GetBlackboardComponent();
 	if (bbComp == nullptr)
 	{
 		UE_LOG(LogProjectInnStateMachineImpl, Error, TEXT("Cannot find blackboard component on %s"), *customer->GetName());

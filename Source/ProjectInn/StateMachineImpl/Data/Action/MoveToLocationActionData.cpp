@@ -7,7 +7,7 @@
 
 FActionBase* UMoveToLocationActionData::CreateAction()
 {
-	FMoveToLocationAction* moveToLoc = new FMoveToLocationAction(ActionName, LocationKey, IsReachThreshold);
+	FMoveToLocationAction* moveToLoc = new FMoveToLocationAction(ActionName, LocationKey, IsReachThreshold, ObjectAsDest);
 
 	return moveToLoc;
 }

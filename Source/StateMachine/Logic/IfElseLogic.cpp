@@ -3,6 +3,7 @@
 
 #include "IfElseLogic.h"
 #include "StateMachineLog.h"
+#include "Condition/Expression.h"
 #include "Condition/ConditionBase.h"
 #include "Action/ActionBase.h"
 
@@ -12,6 +13,21 @@ FIfElseLogic::FIfElseLogic()
 
 FIfElseLogic::~FIfElseLogic()
 {
+}
+
+void FIfElseLogic::SetExpression(FExpression* expression)
+{
+	m_Expression = MakeShareable(expression);
+}
+
+void FIfElseLogic::SetPositiveAction(FActionBase* action)
+{
+	m_PositiveAction = MakeShareable(action);
+}
+
+void FIfElseLogic::SetNegativeAction(FActionBase* action)
+{
+	m_NegativeAction = MakeShareable(action);
 }
 
 void FIfElseLogic::StartLogic(TWeakPtr<FActionExecutionContext> ctx)
@@ -24,7 +40,7 @@ void FIfElseLogic::UpdateLogic(TWeakPtr<FActionExecutionContext> ctx)
 {
 	//UE_LOG(LogStateMachine, Log, TEXT("Update IfElse Logic"));
 
-	if (!m_Condition.IsValid())
+	if (!m_Expression.IsValid())
 	{
 		return;
 	}
@@ -34,9 +50,7 @@ void FIfElseLogic::UpdateLogic(TWeakPtr<FActionExecutionContext> ctx)
 		return;
 	}
 
-	FConditionBase* condition = m_Condition.Get();
-
-	if (condition->GetIsVerified(ctx.Pin()->ExecuterComponent))
+	if (m_Expression->GetExpressionResult(ctx.Pin()->ExecuterComponent))
 	{
 		UE_LOG(LogStateMachine, Log, TEXT("Try To Execute Positive Action"));
 		if (m_PositiveAction.IsValid())

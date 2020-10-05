@@ -24,13 +24,13 @@ public:
 class PROJECTINN_API FTableRuntimeData
 {
 public:
-	FTableRuntimeData(TSharedPtr<FTableData> tableData);
+	FTableRuntimeData(FTableData tableData);
 
 	void SetOccupiedGroup(TWeakPtr<FCustomerGroup> customerGroup);
 	bool GetIsOccupied() const;
 	TWeakPtr<FCustomerGroup> GetOccupiedGroup();
 
 private:
-	TSharedPtr<FTableData> m_TableData;
+	FTableData m_TableData;
 	TWeakPtr<FCustomerGroup> m_OccupiedGroup;
 };

@@ -132,21 +132,6 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 				NewNode->UpdateGraphNode();
 			}
 		}
-
-		//for (int32 i = 0; i < smNode->Transitions.Num(); i++)
-		//{
-		//	if (smNode->Transitions[i])
-		//	{
-		//		TSharedPtr<SGraphNode> NewNode = FNodeFactory::CreateNodeWidget(smNode->Transitions[i]);
-		//		if (OwnerGraphPanelPtr.IsValid())
-		//		{
-		//			NewNode->SetOwner(OwnerGraphPanelPtr.Pin().ToSharedRef());
-		//			OwnerGraphPanelPtr.Pin()->AttachGraphEvents(NewNode);
-		//		}
-		//		AddTransition(NewNode);
-		//		NewNode->UpdateGraphNode();
-		//	}
-		//}
 	}
 
 	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
@@ -167,21 +152,7 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 	const FMargin NodePadding = FMargin(2.0f);
 	this->ContentScale.Bind(this, &SGraphNode::GetContentScale);
 
-	//if (bIsTransNode)
-	//{
-	//	this->GetOrAddSlot(ENodeZone::Center)
-	//		.HAlign(HAlign_Fill)
-	//		.VAlign(VAlign_Center)
-	//	[
-	//		SNew(SImage)
-	//		.Image(FEditorStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Icon")))
-	//	];
-
-	//	CreatePinWidgets();
-	//	return;
-	//}
-
-	if (bIsActionNode && bIsLogicNode)
+	if (bIsActionNode)
 	{
 		this->GetOrAddSlot(ENodeZone::Center)
 			.HAlign(HAlign_Fill)
@@ -190,7 +161,7 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 				SNew(SBorder)
 				.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
 				.Padding(0.0f)
-				.BorderBackgroundColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.2f))
+				.BorderBackgroundColor(FLinearColor(1.f, 0.2f, 0.2f, 0.2f))
 				.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
 				[
 					SNew(SVerticalBox)
@@ -215,6 +186,41 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 			];
 
 	    return;
+	}
+	else if (bIsLogicNode)
+	{
+		this->GetOrAddSlot(ENodeZone::Center)
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBorder)
+				.BorderImage(FEditorStyle::GetBrush("Graph.StateNode.Body"))
+			.Padding(0.0f)
+			.BorderBackgroundColor(FLinearColor(0.2f,0.2f,1.f,0.2f))
+			.OnMouseButtonDown(this, &SGraphNode_StateMachine::OnMouseDown)
+			[
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+				.Style(FEditorStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+			.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+			.OnVerifyTextChanged(this, &SGraphNode_StateMachine::OnVerifyNameTextChanged)
+			.OnTextCommitted(this, &SGraphNode_StateMachine::OnNameTextCommited)
+			.IsReadOnly(this, &SGraphNode_StateMachine::IsNameReadOnly)
+			.IsSelected(this, &SGraphNode_StateMachine::IsSelectedExclusively)
+			]
+		+ SVerticalBox::Slot()
+			.AutoHeight()
+			.HAlign(HAlign_Center)
+			[
+				NodeTitle.ToSharedRef()
+			]
+			]
+			];
+
+		return;
 	}
 
 	this->GetOrAddSlot(ENodeZone::Center)
@@ -282,7 +288,7 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 							[
 								SAssignNew(NodeBody, SBorder)
 								.BorderImage(FEditorStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-								.BorderBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 0.1f))
+								.BorderBackgroundColor(FLinearColor(0.5f, 0.5f, 0.5f, 1.0f))
 								.HAlign(HAlign_Fill)
 								.VAlign(VAlign_Center)
 								.Visibility(EVisibility::SelfHitTestInvisible)
@@ -334,25 +340,6 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 								]
 							]
 						]
-						// OUTPUT PIN AREA
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						[
-							SNew(SBox)
-							.MinDesiredHeight(NodePadding.Bottom)
-							[
-								SAssignNew(RightNodeBox, SVerticalBox)
-								+ SVerticalBox::Slot()
-								.HAlign(HAlign_Fill)
-								.VAlign(VAlign_Fill)
-								//.Padding(20.0f, 0.0f)
-								.FillHeight(1.0f)
-								[
-									SAssignNew(OutputPinBox, SHorizontalBox)
-								]
-							]
-						]
-
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
@@ -372,6 +359,26 @@ void SGraphNode_StateMachine::UpdateGraphNode()
 								]
 							]
 						]
+						// OUTPUT PIN AREA
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							SNew(SBox)
+							.MinDesiredHeight(NodePadding.Bottom)
+							[
+								SAssignNew(RightNodeBox, SVerticalBox)
+								+ SVerticalBox::Slot()
+								.HAlign(HAlign_Fill)
+								.VAlign(VAlign_Fill)
+								//.Padding(20.0f, 0.0f)
+								.FillHeight(1.0f)
+								[
+									SAssignNew(OutputPinBox, SHorizontalBox)
+								]
+							]
+						]
+
+						
 					]
 
 					// Drag marker overlay

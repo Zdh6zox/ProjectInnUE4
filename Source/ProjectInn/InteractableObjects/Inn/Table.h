@@ -28,7 +28,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void InitializeTable(TSharedPtr<FTableData> tableDataBase);
+	void InitializeTable(FTableData tableDataBase);
 
 	void OccupiedBy(TWeakPtr<FCustomerGroup> group);
 

@@ -18,6 +18,7 @@ class PROJECTINN_API ACustomer : public ANonPlayerCharacter
 	GENERATED_BODY()
 	
 public:
+	/** Default UObject constructor. */
 	ACustomer();
 
 	virtual void BeginPlay() override;

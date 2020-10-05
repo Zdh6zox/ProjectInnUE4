@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Logic/LogicBase.h"
 
-class FConditionBase;
 class FActionBase;
+class FExpression;
 /**
  * 
  */
@@ -19,10 +19,12 @@ public:
 	virtual void StartLogic(TWeakPtr<FActionExecutionContext> ctx) override;
 	virtual void UpdateLogic(TWeakPtr<FActionExecutionContext> ctx) override;
 
-	void SetCondition(TSharedPtr<FConditionBase> condition) { m_Condition = condition; }
+	void SetPositiveAction(FActionBase* action);
+	void SetNegativeAction(FActionBase* action);
+	void SetExpression(FExpression* expression);
 
 private:
-	TSharedPtr<FConditionBase> m_Condition;
+	TSharedPtr<FExpression> m_Expression;
 	TSharedPtr<FActionBase> m_PositiveAction;
 	TSharedPtr<FActionBase> m_NegativeAction;
 };

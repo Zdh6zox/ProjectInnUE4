@@ -68,8 +68,10 @@ void FInnManager::SpawnTables()
 	for (int i = 0; i < m_CurrentInnSaveData->Tables.Num(); ++i)
 	{
 		FTransform tableTrans = m_CurrentInnSaveData->Tables[i].TableTransform;
+
 		
 		ATable* spawnedTable = world->SpawnActor<ATable>(m_TableClass, tableTrans.GetLocation(), tableTrans.GetRotation().Rotator());
+		spawnedTable->InitializeTable(m_CurrentInnSaveData->Tables[i]);
 		m_CurrentTables.Add(spawnedTable);
 	}
 }

@@ -231,6 +231,7 @@ void FStateMachineEditor::OnPackageSaved(const FString& PackageFileName, UObject
 
 void FStateMachineEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
 {
+	
 	StateMachineData->SMGraph->GetSchema()->ForceVisualizationCacheClear();
 }
 

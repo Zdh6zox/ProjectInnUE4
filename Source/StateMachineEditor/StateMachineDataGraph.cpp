@@ -48,16 +48,13 @@ void UStateMachineDataGraph::UpdateAsset(int32 UpdateFlags /* = 0 */)
 	{
 		UStateMachineGraphNode_State* stateNode = Cast<UStateMachineGraphNode_State>(Nodes[i]);
 
-		if (stateNode == nullptr)
+		if (stateNode != nullptr)
 		{
-			// ignore non state node right now
-			continue;
-		}
-
-		UStateData* stateData = Cast<UStateData>(stateNode->NodeInstance);
-		if (stateData != nullptr)
-		{
-			smAsset->States.Add(stateData);
+			UStateData* stateData = Cast<UStateData>(stateNode->NodeInstance);
+			if (stateData != nullptr)
+			{
+				smAsset->States.Add(stateData);
+			}
 		}
 	}
 }

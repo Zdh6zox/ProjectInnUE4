@@ -45,7 +45,7 @@ void ATable::Tick(float DeltaTime)
 
 }
 
-void ATable::InitializeTable(TSharedPtr<FTableData> tableDataBase)
+void ATable::InitializeTable(FTableData tableDataBase)
 {
 	FTableRuntimeData* runtimeData = new FTableRuntimeData(tableDataBase);
 

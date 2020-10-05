@@ -4,7 +4,7 @@
 #include "TableData.h"
 #include "Character/Customer/CustomerGroup.h"
 
-FTableRuntimeData::FTableRuntimeData(TSharedPtr<FTableData> tableData)
+FTableRuntimeData::FTableRuntimeData(FTableData tableData)
 {
 	m_TableData = tableData;
 }

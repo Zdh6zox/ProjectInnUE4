@@ -3,6 +3,8 @@
 
 #include "StateMachineGraphNode_State.h"
 #include "Data/State/StateData.h"
+#include "Data/Action/ActionDataBase.h"
+#include "Data/Logic/LogicDataBase.h"
 #include "StateMachineEditorTypes.h"
 #include "StateMachineGraphNode_Transition.h"
 #include "StateMachineGraphNode_Action.h"
@@ -70,24 +72,76 @@ void UStateMachineGraphNode_State::OnSubNodeAdded(UAIGraphNode* SubNode)
 {
 	UStateMachineGraphNode* smGraphNode = Cast<UStateMachineGraphNode>(SubNode);
 
+	UStateData* stateData = Cast<UStateData>(NodeInstance);
+
 	if (UStateMachineGraphNode_Action* actionNode = Cast<UStateMachineGraphNode_Action>(SubNode))
 	{
 		if (actionNode->IsEnterAction)
 		{
 			EnterActions.Add(actionNode);
+
+			UActionDataBase* enterActionData = Cast<UActionDataBase>(actionNode->NodeInstance);
+			if (enterActionData != nullptr)
+			{
+				stateData->EnterActions.Add(enterActionData);
+			}
 		}
 		else
 		{
 			ExitActions.Add(actionNode);
+
+			UActionDataBase* exitActionData = Cast<UActionDataBase>(actionNode->NodeInstance);
+			if (exitActionData != nullptr)
+			{
+				stateData->ExitActions.Add(exitActionData);
+			}
 		}
 	}
 	else if (UStateMachineGraphNode_Logic* logicNode = Cast<UStateMachineGraphNode_Logic>(SubNode))
 	{
 		Logics.Add(logicNode);
+
+		ULogicDataBase* logicData = Cast<ULogicDataBase>(logicNode->NodeInstance);
+		if (logicData != nullptr)
+		{
+			stateData->UpdateLogics.Add(logicData);
+		}
 	}
 }
 
 void UStateMachineGraphNode_State::OnSubNodeRemoved(UAIGraphNode* SubNode)
 {
+	UStateMachineGraphNode* smGraphNode = Cast<UStateMachineGraphNode>(SubNode);
+	UStateData* stateData = Cast<UStateData>(NodeInstance);
 
+	if (UStateMachineGraphNode_Action* actionNode = Cast<UStateMachineGraphNode_Action>(SubNode))
+	{
+		if (actionNode->IsEnterAction)
+		{
+			UActionDataBase* enterActionData = Cast<UActionDataBase>(actionNode->NodeInstance);
+			if (enterActionData != nullptr)
+			{
+				stateData->EnterActions.Remove(enterActionData);
+			}
+			EnterActions.Remove(actionNode);
+		}
+		else
+		{
+			UActionDataBase* exitActionData = Cast<UActionDataBase>(actionNode->NodeInstance);
+			if (exitActionData != nullptr)
+			{
+				stateData->ExitActions.Remove(exitActionData);
+			}
+			ExitActions.Remove(actionNode);
+		}
+	}
+	else if (UStateMachineGraphNode_Logic* logicNode = Cast<UStateMachineGraphNode_Logic>(SubNode))
+	{
+		ULogicDataBase* logicData = Cast<ULogicDataBase>(actionNode->NodeInstance);
+		if (logicData != nullptr)
+		{
+			stateData->UpdateLogics.Remove(logicData);
+		}
+		Logics.Remove(logicNode);
+	}
 }

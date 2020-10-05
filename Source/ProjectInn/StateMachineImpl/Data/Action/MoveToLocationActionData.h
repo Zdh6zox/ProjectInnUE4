@@ -20,6 +20,9 @@ public:
 		FName LocationKey;
 
 	UPROPERTY(EditAnywhere)
+		bool ObjectAsDest;
+
+	UPROPERTY(EditAnywhere)
 		float IsReachThreshold;
 
 	virtual FActionBase* CreateAction() override;

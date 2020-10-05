@@ -12,7 +12,6 @@
 #include "ProjectInn.h"
 
 ACustomer::ACustomer()
-	:ANonPlayerCharacter()
 {
 	//ACustomerController* controller = NewObject<ACustomerController>(this, "Customer Controller");
 	//controller->SetPawn(this);
@@ -24,8 +23,6 @@ ACustomer::ACustomer()
 
 void ACustomer::BeginPlay()
 {
-	Super::BeginPlay();
-
 	m_IsTicked = false;
 
 	ACustomerController* customerController = Cast<ACustomerController>(GetController());
@@ -45,6 +42,8 @@ void ACustomer::BeginPlay()
 		clickedDelegate.BindUFunction(this, "OnMouseLeftBtnClicked");
 		innPlayerController->MouseLeftBtnClickedOneParamDel.Add(clickedDelegate);
 	}
+
+	Super::BeginPlay();
 }
 
 void ACustomer::Tick(float DeltaSeconds)
@@ -60,7 +59,7 @@ void ACustomer::Tick(float DeltaSeconds)
 
 void ACustomer::TestMove()
 {
-	FMoveToLocationAction* moveToLoc = new FMoveToLocationAction("Test_Move", "1", 0.0f);
+	//FMoveToLocationAction* moveToLoc = new FMoveToLocationAction("Test_Move", "1", 0.0f);
 }
 
 UBlackboardComponent* ACustomer::GetBlackboardComponent() const

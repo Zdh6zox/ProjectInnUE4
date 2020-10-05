@@ -8,11 +8,12 @@
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 
-FMoveToLocationAction::FMoveToLocationAction(FString actionName, FName locationKey, float isReachThreshold)
+FMoveToLocationAction::FMoveToLocationAction(FString actionName, FName locationKey, float isReachThreshold, bool objectAsDest)
 	:FActionBase(actionName)
 {
 	m_LocationKey = locationKey;
 	m_IsReachThreshold = isReachThreshold;
+	m_ObjectAsDest = objectAsDest;
 }
 
 FMoveToLocationAction::~FMoveToLocationAction()
@@ -32,19 +33,37 @@ void FMoveToLocationAction::Execute(TWeakPtr<FActionExecutionContext> ctx)
 	ACustomer* customer = Cast<ACustomer>(owner->GetOwner());
 	FString ownerName;
 	customer->GetName(ownerName);
-	UE_LOG(LogStateMachineAction, Log, TEXT("Move To Location %s"), *ownerName);
+	UE_LOG(LogStateMachineAction, Log, TEXT("%s Moving To Location"), *ownerName);
+
+	FVector destination = FVector::ZeroVector;
+	UBlackboardComponent* bbComp = customer->GetBlackboardComponent();
+	if (bbComp != nullptr)
+	{
+		if (m_ObjectAsDest)
+		{
+			AActor* destinationActor = Cast<AActor>(bbComp->GetValueAsObject(m_LocationKey));
+			if (destinationActor != nullptr)
+			{
+				destination = destinationActor->GetTransform().GetLocation();
+			}
+		}
+		else
+		{
+			destination = bbComp->GetValueAsVector(m_LocationKey);
+		}
+	}
 
 	ACustomerController* customerController = Cast<ACustomerController>(customer->GetController());
 	if (customerController)
 	{
-		UBlackboardComponent* bbComp = customer->GetBlackboardComponent();
-		if (bbComp != nullptr)
+		if (!customerController->IsMovingTo(destination))
 		{
-			customerController->MoveToPosition(bbComp->GetValueAsVector(m_LocationKey));
-			if (customerController->IsMovingTo(bbComp->GetValueAsVector(m_LocationKey)))
-			{
-				m_ExecuteState = EActionExecuteState::Running;
-			}
+			customerController->MoveToPosition(destination);
+		}
+
+		if (customerController->IsMovingTo(destination))
+		{
+			m_ExecuteState = EActionExecuteState::Running;
 		}
 		else
 		{

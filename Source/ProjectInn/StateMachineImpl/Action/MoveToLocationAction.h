@@ -12,7 +12,7 @@ class PROJECTINN_API FMoveToLocationAction : public FActionBase
 {
 public:
 	typedef FActionBase super;
-	FMoveToLocationAction(FString actionName, FName locationKey, float isReachThreshold);
+	FMoveToLocationAction(FString actionName, FName locationKey, float isReachThreshold, bool objectAsDest);
 	~FMoveToLocationAction();
 
 	virtual void Init(TWeakPtr<FActionExecutionContext> ctx) override;
@@ -20,5 +20,6 @@ public:
 
 private:
 	FName m_LocationKey;
+	bool m_ObjectAsDest;
 	float m_IsReachThreshold;
 };
