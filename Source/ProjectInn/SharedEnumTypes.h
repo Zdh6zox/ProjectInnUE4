@@ -17,6 +17,16 @@ enum class EFloorBlockMaterial : uint8
 };
 
 UENUM(BlueprintType)
+enum class EConstructableObjectType : uint8
+{
+	Floor UMETA(DisplayName = "地板"),
+	Door UMETA(DisplayName = "门"),
+	Decorate UMETA(DisplayName = "装饰"),
+	Table UMETA(DisplayName = "桌子"),
+	Stairs UMETA(DisplayName = "楼梯")
+};
+
+UENUM(BlueprintType)
 enum class ERelationType : uint8
 {
 	DirectRelative,
@@ -77,4 +87,12 @@ enum class ERecipeCategoryType : uint8
 	AssitantDish UMETA(DisplayName = "配菜"),
 	Dessert UMETA(DisplayName = "甜点"),
 	StapleFood UMETA(DisplayName = "主食")
+};
+
+UENUM(BlueprintType)
+enum class EInnManagerMode : uint8
+{
+	Normal,
+	Construct,
+	Decorate
 };

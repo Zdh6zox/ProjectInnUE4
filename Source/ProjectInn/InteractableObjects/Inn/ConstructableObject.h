@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "InputReceivableObject.h"
+#include "Data/ConstructableObjectData.h"
 #include "ConstructableObject.generated.h"
 
 UCLASS()
@@ -17,10 +18,7 @@ public:
 	AConstructableObject();
 
 	UPROPERTY(EditAnywhere)
-	int SizeX;
-
-	UPROPERTY(EditAnywhere)
-	int SizeY;
+	FConstructableObjectData ObjectData;
 
 protected:
 	// Called when the game starts or when spawned

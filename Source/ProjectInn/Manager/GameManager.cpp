@@ -24,6 +24,7 @@ void AGameManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	m_InnManager.Tick();
 }
 
 UWorld* AGameManager::GetAssociatedWorld() const
@@ -89,3 +90,24 @@ UMaterial* AGameManager::Test_LoadFloorBlockMat(EFloorBlockMaterial mat)
 	return m_InnManager.LoadFloorBlockAssetMat(mat);
 }
 
+void AGameManager::ChangeInnManagerMode(EInnManagerMode mode)
+{
+	switch (mode)
+	{
+	case EInnManagerMode::Normal:
+		m_InnManager.ExitConstructMode();
+		break;
+	case EInnManagerMode::Construct:
+		m_InnManager.EnterConstructMode();
+		break;
+	case EInnManagerMode::Decorate:
+		break;
+	default:
+		break;
+	}
+}
+
+void AGameManager::SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass)
+{
+	
+}

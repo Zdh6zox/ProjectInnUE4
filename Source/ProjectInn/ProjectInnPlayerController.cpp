@@ -61,6 +61,16 @@ void AProjectInnPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
+bool AProjectInnPlayerController::IsLeftBtnPressed()
+{
+	return PlayerInput->IsPressed(EKeys::LeftMouseButton);
+}
+
+bool AProjectInnPlayerController::WasLeftBtnReleased()
+{
+	return PlayerInput->WasJustReleased(EKeys::LeftMouseButton);
+}
+
 void AProjectInnPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings

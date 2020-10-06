@@ -16,7 +16,8 @@ class PROJECTINN_API AFloorBlock : public AConstructableObject
 	GENERATED_BODY()
 	
 public:
-	
+	AFloorBlock();
+
 	UPROPERTY(EditAnywhere)
 	EFloorBlockMaterial BlockMaterial = EFloorBlockMaterial::Mud;
 

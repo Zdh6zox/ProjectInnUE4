@@ -60,6 +60,9 @@ protected:
 
 	bool IsCursorSnapOnScreenEdge(FVector& cameraMovement);
 
+	bool IsLeftBtnPressed();
+	bool WasLeftBtnReleased();
+
 private:
 	TWeakObjectPtr<AActor> m_PreFocusedObject;
 };

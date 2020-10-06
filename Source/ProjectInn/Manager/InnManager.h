@@ -10,7 +10,10 @@ class AGameManager;
 class UInnData;
 class FTableSearchRequest;
 class ACounter;
+class AFloorBlock;
+class ABaseBlock;
 class UMaterial;
+class AConstructableObject;
 struct FTableData;
 /**
  * 
@@ -24,6 +27,15 @@ public:
 	ATable* FindTable(FTableSearchRequest request);
 	ACounter* FindCounter();
 
+	void SpawnFloorBlock();
+
+	void EnterConstructMode();
+	void ExitConstructMode();
+
+	void Tick();
+
+	void UpdateConstructMode();
+
 	void RegisterCounter(ACounter* counter);
 
 	void SaveGame(FString slotName);
@@ -31,14 +43,22 @@ public:
 
 	UMaterial* LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat);
 
+	void SetSelectedClass(TSubclassOf<AConstructableObject> objectClass);
+
 	//Dev Functions
 	void ClearCurrentTableData();
 	void AddTableData(FTableData tableData);
 
 private:
 	TArray<ATable*> m_CurrentTables;
+	TArray<ABaseBlock*> m_BaseBlocks;
 	TWeakObjectPtr<AGameManager> m_GameManager;
 	UInnData* m_CurrentInnSaveData;
 	TSubclassOf<ATable> m_TableClass;
+	TSubclassOf<AFloorBlock> m_FloorBlockClass;
 	TWeakObjectPtr<ACounter> m_Counter;
+	EInnManagerMode m_CurrentMode;
+
+	TSubclassOf<AConstructableObject> m_CurrentSelectedClass;
+	AConstructableObject* m_CurrentDisplayObject;
 };

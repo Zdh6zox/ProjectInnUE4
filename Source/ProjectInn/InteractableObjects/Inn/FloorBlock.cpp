@@ -4,6 +4,12 @@
 #include "FloorBlock.h"
 #include "Manager/GameManager.h"
 
+AFloorBlock::AFloorBlock()
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+}
+
 void AFloorBlock::InitializeBlockWithMaterial(EFloorBlockMaterial matType)
 {
 	BlockMaterial = matType;

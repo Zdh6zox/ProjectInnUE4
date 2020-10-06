@@ -12,6 +12,7 @@
 #include "Engine/DataTable.h" 
 #include "InteractableObjects/Inn/TableData.h"
 #include "InteractableObjects/Inn/Table.h"
+#include "InteractableObjects/Inn/FloorBlock.h"
 #include "SharedEnumTypes.h"
 #include "Materials/Material.h"
 #include "GameManager.generated.h"
@@ -60,6 +61,12 @@ public:
 	UFUNCTION(BlueprintCallable, category = "Test Function")
 		UMaterial* Test_LoadFloorBlockMat(EFloorBlockMaterial mat);
 
+	UFUNCTION(BlueprintCallable, category = "Inn Manager")
+		void ChangeInnManagerMode(EInnManagerMode mode);
+
+	UFUNCTION(BlueprintCallable, category = "Inn Manager")
+		void SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass);
+
 	UPROPERTY(VisibleAnywhere, Transient)
 		TArray<ACustomer*> AllCustomers;
 
@@ -74,6 +81,9 @@ public:
 
 	UPROPERTY(EditAnywhere, category = "Floor Block Assets")
 		FString FloorBlockAssetDir;
+
+	UPROPERTY(EditAnywhere, category = "Floor Block Assets")
+		TSubclassOf<AFloorBlock> FloorBlockTemplate;
 
 	static AGameManager* GetGameManager(UWorld* world);
 

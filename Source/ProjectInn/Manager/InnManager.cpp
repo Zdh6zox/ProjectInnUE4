@@ -8,8 +8,11 @@
 #include "InteractableObjects/Inn/Table.h"
 #include "InteractableObjects/Inn/TableSearchRequest.h"
 #include "InteractableObjects/Inn/Counter.h"
+#include "InteractableObjects/Inn/FloorBlock.h"
+#include "InteractableObjects/Inn/BaseBlock.h"
 #include "Materials/Material.h"
 #include "UObject/ConstructorHelpers.h"
+#include "ProjectInnPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -21,6 +24,11 @@ void FInnManager::InitializeManager(AGameManager* gm)
 	if (m_TableClass == nullptr)
 	{
 		UE_LOG(LogProjectInn, Error, TEXT("Miss setup table class in Game Manager"));
+	}
+	m_FloorBlockClass = gm->FloorBlockTemplate;
+	if (m_FloorBlockClass == nullptr)
+	{
+		UE_LOG(LogProjectInn, Error, TEXT("Miss setup floor block class in Game Manager"));
 	}
 	//Search available save data
 	USaveGame* saveGame = UGameplayStatics::LoadGameFromSlot("Slot1", 0);
@@ -35,6 +43,20 @@ void FInnManager::InitializeManager(AGameManager* gm)
 
 	//Clear out old data
 	m_CurrentTables.Empty();
+	m_BaseBlocks.Empty();
+
+	m_CurrentSelectedClass = NULL;
+	m_CurrentDisplayObject = NULL;
+	m_CurrentMode = EInnManagerMode::Normal;
+
+	TArray<AActor*> foundBaseBlocks;
+	UGameplayStatics::GetAllActorsOfClass(m_GameManager.Get(), ABaseBlock::StaticClass(), foundBaseBlocks);
+
+	for (int i = 0; i < foundBaseBlocks.Num(); ++i)
+	{
+		ABaseBlock* baseBlock = Cast<ABaseBlock>(foundBaseBlocks[i]);
+		m_BaseBlocks.Add(baseBlock);
+	}
 }
 
 void FInnManager::SaveGame(FString slotName)
@@ -75,6 +97,23 @@ void FInnManager::SpawnTables()
 		spawnedTable->InitializeTable(m_CurrentInnSaveData->Tables[i]);
 		//m_CurrentTables.Add(spawnedTable);
 	}
+}
+
+void FInnManager::Tick()
+{
+	if (m_CurrentMode == EInnManagerMode::Construct)
+	{
+		UpdateConstructMode();
+	}
+}
+
+void FInnManager::UpdateConstructMode()
+{
+	//if (m_CurrentDisplayObject != NULL)
+	//{
+	//	//Move display object under cursor
+	//	AProjectInnPlayerController* controller = Cast<AProjectInnPlayerController>(UGameplayStatics::GetPlayerController(m_GameManager.Get(), 0));
+	//}
 }
 
 void FInnManager::LoadGame(FString slotName)
@@ -147,4 +186,43 @@ UMaterial* FInnManager::LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat)
 	UMaterial* loadedMat = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), NULL, *assetPath));
 
 	return loadedMat;
+}
+
+void FInnManager::EnterConstructMode()
+{
+	m_CurrentMode = EInnManagerMode::Construct;
+
+	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	{
+		if (ABaseBlock* block = m_BaseBlocks[i])
+		{
+			block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Normal);
+		}
+	}
+}
+
+void FInnManager::ExitConstructMode()
+{
+	m_CurrentMode = EInnManagerMode::Normal;
+
+	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	{
+		if (ABaseBlock* block = m_BaseBlocks[i])
+		{
+			block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Transparent);
+		}
+	}
+}
+
+void FInnManager::SpawnFloorBlock()
+{
+
+}
+
+void FInnManager::SetSelectedClass(TSubclassOf<AConstructableObject> objectClass)
+{
+	m_CurrentSelectedClass = objectClass;
+
+	//Spawn display actor under cursor
+
 }

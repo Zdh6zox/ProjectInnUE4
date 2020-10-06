@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "InteractableObjects/Inn/TableData.h"
+#include "InteractableObjects/Inn/Data/BaseBlockData.h"
 #include "InnData.generated.h"
 /**
  * 
@@ -21,4 +22,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TArray<FTableData> Tables;
+
+	UPROPERTY(EditAnywhere)
+		TArray<FConstructableObjectData> ConstructableObjectsData;
 };
