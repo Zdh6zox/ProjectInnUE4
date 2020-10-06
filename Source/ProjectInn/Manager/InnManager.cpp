@@ -8,6 +8,7 @@
 #include "InteractableObjects/Inn/Table.h"
 #include "InteractableObjects/Inn/TableSearchRequest.h"
 #include "InteractableObjects/Inn/Counter.h"
+#include "Materials/Material.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -72,7 +73,7 @@ void FInnManager::SpawnTables()
 		
 		ATable* spawnedTable = world->SpawnActor<ATable>(m_TableClass, tableTrans.GetLocation(), tableTrans.GetRotation().Rotator());
 		spawnedTable->InitializeTable(m_CurrentInnSaveData->Tables[i]);
-		m_CurrentTables.Add(spawnedTable);
+		//m_CurrentTables.Add(spawnedTable);
 	}
 }
 
@@ -109,4 +110,41 @@ void FInnManager::AddTableData(FTableData tableData)
 void FInnManager::ClearCurrentTableData()
 {
 	m_CurrentInnSaveData->Tables.Empty();
+}
+
+UMaterial* FInnManager::LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat)
+{
+	FString assetDir = m_GameManager->FloorBlockAssetDir;
+	FString assetPath = assetDir;
+
+	switch (blockMat)
+	{
+	case EFloorBlockMaterial::Mud:
+		assetPath += "/Mud.Mud";
+		break;
+	case EFloorBlockMaterial::Plank:
+		assetPath += "/Plank.Plank";
+		break;
+	case EFloorBlockMaterial::Granite:
+		assetPath += "/Granite.Granite";
+		break;
+	case EFloorBlockMaterial::Bamboo:
+		assetPath += "/Bamboo.Bamboo";
+		break;
+	case EFloorBlockMaterial::Brick:
+		assetPath += "/Brick.Brick";
+		break;
+	case EFloorBlockMaterial::GoldenBrick:
+		assetPath += "/GoldenBrick.GoldenBrick";
+		break;
+	case EFloorBlockMaterial::Jade:
+		assetPath += "/Jade.Jade";
+		break;
+	default:
+		break;
+	}
+
+	UMaterial* loadedMat = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), NULL, *assetPath));
+
+	return loadedMat;
 }

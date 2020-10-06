@@ -84,3 +84,8 @@ AGameManager* AGameManager::GetGameManager(UWorld* world)
 	return nullptr;
 }
 
+UMaterial* AGameManager::Test_LoadFloorBlockMat(EFloorBlockMaterial mat)
+{
+	return m_InnManager.LoadFloorBlockAssetMat(mat);
+}
+

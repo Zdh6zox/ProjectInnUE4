@@ -3,23 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SharedEnumTypes.h"
 #include "RelationData.generated.h"
 
 /**
  * 
  */
-UENUM(BlueprintType)
-enum class ERelationType : uint8
-{
-	DirectRelative,
-	Relative,
-	Couple,
-	Friend,
-	Normal,
-	Unlike,
-	Enemy
-};
-
 USTRUCT(BlueprintType)
 struct PROJECTINN_API FRelationData
 {

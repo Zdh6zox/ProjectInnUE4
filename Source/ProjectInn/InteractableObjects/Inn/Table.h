@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TableData.h"
-#include "InputReceivableObject.h"
+#include "ConstructableObject.h"
 #include "Table.generated.h"
 
 class FTableRuntimeData;
 class FCustomerGroup;
 
 UCLASS()
-class PROJECTINN_API ATable : public AActor, public IInputReceivableObject
+class PROJECTINN_API ATable : public AConstructableObject
 {
 	GENERATED_BODY()
 	
@@ -37,17 +37,11 @@ public:
 	UFUNCTION(BlueprintCallable)
         FTableData Test_CreateTableData();
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseLeftBtnClicked(AActor* focusedActor);
-	    void OnMouseLeftBtnClicked_Implementation(AActor* focusedActor) override;
+	virtual void OnMouseLeftBtnClicked_Implementation(AActor* focusedActor) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseFocused(AActor* focusedActor);
-	    void OnMouseFocused_Implementation(AActor* focusedActor) override;
+	virtual void OnMouseFocused_Implementation(AActor* focusedActor) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseFocusLeft();
-		void OnMouseFocusLeft_Implementation() override;
+	virtual void OnMouseFocusLeft_Implementation() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnMouseLeftBtnClickedOnThis_BP();

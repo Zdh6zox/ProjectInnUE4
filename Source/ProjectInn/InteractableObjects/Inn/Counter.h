@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "InputReceivableObject.h"
+#include "ConstructableObject.h"
 #include "Counter.generated.h"
 
 UCLASS()
-class PROJECTINN_API ACounter : public AActor, public IInputReceivableObject
+class PROJECTINN_API ACounter : public AConstructableObject
 {
 	GENERATED_BODY()
 	
@@ -24,15 +24,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseLeftBtnClicked(AActor* focusedActor);
-	    void OnMouseLeftBtnClicked_Implementation(AActor* focusedActor) override;
+	virtual void OnMouseLeftBtnClicked_Implementation(AActor* focusedActor) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseFocused(AActor* focusedActor);
-	    void OnMouseFocused_Implementation(AActor* focusedActor) override;
+	virtual void OnMouseFocused_Implementation(AActor* focusedActor) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-		void OnMouseFocusLeft();
-	    void OnMouseFocusLeft_Implementation() override;
+	virtual void OnMouseFocusLeft_Implementation() override;
 };

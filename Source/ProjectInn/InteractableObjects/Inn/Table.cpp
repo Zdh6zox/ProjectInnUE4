@@ -52,6 +52,8 @@ void ATable::InitializeTable(FTableData tableDataBase)
 	m_RuntimeData = MakeShareable(runtimeData);
 }
 
+
+
 void ATable::OccupiedBy(TWeakPtr<FCustomerGroup> group)
 {
 	m_RuntimeData->SetOccupiedGroup(group);

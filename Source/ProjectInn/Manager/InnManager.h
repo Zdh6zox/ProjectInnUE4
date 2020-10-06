@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SharedEnumTypes.h"
 
 class ATable;
 class AGameManager;
 class UInnData;
 class FTableSearchRequest;
 class ACounter;
+class UMaterial;
 struct FTableData;
 /**
  * 
@@ -26,6 +28,8 @@ public:
 
 	void SaveGame(FString slotName);
 	void LoadGame(FString slotName);
+
+	UMaterial* LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat);
 
 	//Dev Functions
 	void ClearCurrentTableData();

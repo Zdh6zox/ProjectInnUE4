@@ -12,6 +12,8 @@
 #include "Engine/DataTable.h" 
 #include "InteractableObjects/Inn/TableData.h"
 #include "InteractableObjects/Inn/Table.h"
+#include "SharedEnumTypes.h"
+#include "Materials/Material.h"
 #include "GameManager.generated.h"
 
 
@@ -34,26 +36,29 @@ public:
 
 	UWorld* GetAssociatedWorld() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,category = "Test Function")
 		void Test_SpawnCustomer(const FVector& refPos, const FRotator& refRot);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_SpawnCustomerGroup(const FVector& refPos, const FRotator& refRot, const FCustomerGroupFormation& formation);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_ClearCustomers();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_SpawnTables();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_AddTable(FTableData tableData);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_ClearTable();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_SaveGame(FString slotName);
+
+	UFUNCTION(BlueprintCallable, category = "Test Function")
+		UMaterial* Test_LoadFloorBlockMat(EFloorBlockMaterial mat);
 
 	UPROPERTY(VisibleAnywhere, Transient)
 		TArray<ACustomer*> AllCustomers;
@@ -67,11 +72,14 @@ public:
 	UPROPERTY(EditAnywhere, category = "Inn Manager")
 		TSubclassOf<ATable> TableTemplate;
 
+	UPROPERTY(EditAnywhere, category = "Floor Block Assets")
+		FString FloorBlockAssetDir;
+
 	static AGameManager* GetGameManager(UWorld* world);
 
-	FInnManager GetInnManager() { return m_InnManager; }
-	FCustomerManager GetCustomerManager() { return m_CustomerManager; }
-	FRecipeManager GetRecipeManager() { return m_RecipeManager; }
+	FInnManager& GetInnManager() { return m_InnManager; }
+	FCustomerManager& GetCustomerManager() { return m_CustomerManager; }
+	FRecipeManager& GetRecipeManager() { return m_RecipeManager; }
 
 private:
 	void InitializeManager();
