@@ -35,30 +35,53 @@ void AProjectInnPlayerController::PlayerTick(float DeltaTime)
 	GetHitResultUnderCursor(ECC_Visibility, false, hitResult);
 	if (hitResult.bBlockingHit)
 	{
+		m_HittedLocation = hitResult.Location;
 		AActor* hittedActor = hitResult.Actor.Get();
 		if (IInputReceivableObject* receivedObject = Cast<IInputReceivableObject>(hittedActor))
 		{
-			if (hittedActor != m_PreFocusedObject.Get())
+			if (receivedObject->Execute_CanReceiveInput(hittedActor))
 			{
-				receivedObject->Execute_OnMouseFocusLeft(hittedActor);
-				m_PreFocusedObject = hittedActor;
-			}
+				if (hittedActor != m_PreFocusedObject.Get())
+				{
+					if (m_PreFocusedObject.IsValid())
+					{
+						if (IInputReceivableObject* preObject = Cast<IInputReceivableObject>(m_PreFocusedObject.Get()))
+						{
+							preObject->Execute_OnMouseFocusLeft(m_PreFocusedObject.Get());
+						}
+					}
+					m_PreFocusedObject = hittedActor;
+				}
 
-			MouseFocusedOneParamDel.Broadcast(hittedActor);
-			if (PlayerInput->WasJustReleased(EKeys::LeftMouseButton))
-			{
-				MouseLeftBtnClickedOneParamDel.Broadcast(hittedActor);
+				receivedObject->Execute_OnMouseFocused(hittedActor, hittedActor);
+				if (PlayerInput->WasJustReleased(EKeys::LeftMouseButton))
+				{
+					receivedObject->Execute_OnMouseLeftBtnClicked(hittedActor, hittedActor);
+				}
+
+				return;
 			}
 		}
-		else
+	}
+
+	if (m_PreFocusedObject.IsValid())
+	{
+		if (IInputReceivableObject* preObject = Cast<IInputReceivableObject>(m_PreFocusedObject.Get()))
 		{
-			m_PreFocusedObject = nullptr;
+			preObject->Execute_OnMouseFocusLeft(m_PreFocusedObject.Get());
 		}
 	}
-	else
-	{
-		m_PreFocusedObject = nullptr;
-	}
+	m_PreFocusedObject = NULL;
+}
+
+FVector AProjectInnPlayerController::GetLocationUnderCursor()
+{
+	return m_HittedLocation;
+}
+
+IInputReceivableObject* AProjectInnPlayerController::GetObjectUnderCursor()
+{
+	return Cast<IInputReceivableObject>(m_PreFocusedObject.Get());
 }
 
 bool AProjectInnPlayerController::IsLeftBtnPressed()

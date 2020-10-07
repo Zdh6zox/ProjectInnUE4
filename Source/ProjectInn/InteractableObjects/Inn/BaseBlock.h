@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Data/BaseBlockData.h"
 #include "InputReceivableObject.h"
 #include "BaseBlock.generated.h"
 
 
 class UStaticMeshComponent;
+class AConstructableObject;
 UCLASS()
 class PROJECTINN_API ABaseBlock : public AActor, public IInputReceivableObject
 {
@@ -23,6 +25,7 @@ public:
 		Transparent,
 		Normal,
 		Error,
+		Highlight,
 		Selected
 	};
 
@@ -39,6 +42,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		FLinearColor SelectedColor;
+
+	UPROPERTY(EditAnywhere)
+		FLinearColor HighlightColor;
+
+	UPROPERTY()
+		TArray<AConstructableObject*> ObjectsOnThisBlock;
 
 protected:
 	// Called when the game starts or when spawned
@@ -62,7 +71,15 @@ public:
 		void OnMouseFocusLeft();
 	void OnMouseFocusLeft_Implementation() override;
 
+	UFUNCTION(BlueprintNativeEvent)
+		bool CanReceiveInput();
+	bool CanReceiveInput_Implementation() override;
+
+	bool CanAddConstructObject(AConstructableObject* objectToAdd);
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* StaticMesh;
+
+	bool m_IsSelected = false;
 };

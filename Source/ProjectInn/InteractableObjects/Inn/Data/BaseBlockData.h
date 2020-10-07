@@ -17,5 +17,5 @@ struct PROJECTINN_API FBaseBlockData
 
 public:
 	UPROPERTY(EditAnywhere)
-		TArray<FConstructableObjectData> ConstructableDataList;
+		TArray<EConstructableObjectType> ContainedObjectType;
 };

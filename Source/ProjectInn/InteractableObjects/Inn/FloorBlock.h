@@ -21,5 +21,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	EFloorBlockMaterial BlockMaterial = EFloorBlockMaterial::Mud;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void ToggleCollision_BP(bool enable);
+
 	void InitializeBlockWithMaterial(EFloorBlockMaterial matType);
+
+	virtual void ToggleCollision(bool enable);
 };

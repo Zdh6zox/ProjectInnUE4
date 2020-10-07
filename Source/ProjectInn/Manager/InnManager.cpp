@@ -109,11 +109,42 @@ void FInnManager::Tick()
 
 void FInnManager::UpdateConstructMode()
 {
-	//if (m_CurrentDisplayObject != NULL)
-	//{
-	//	//Move display object under cursor
-	//	AProjectInnPlayerController* controller = Cast<AProjectInnPlayerController>(UGameplayStatics::GetPlayerController(m_GameManager.Get(), 0));
-	//}
+	AProjectInnPlayerController* controller = Cast<AProjectInnPlayerController>(UGameplayStatics::GetPlayerController(m_GameManager.Get(), 0));
+	if (m_CurrentDisplayObject == NULL && m_CurrentSelectedClass != NULL)
+	{
+		UWorld* world = m_GameManager->GetAssociatedWorld();
+		FTransform spawnTrans;
+		spawnTrans.SetLocation(controller->GetLocationUnderCursor());
+		m_CurrentDisplayObject = world->SpawnActor<AConstructableObject>(m_CurrentSelectedClass, spawnTrans);
+		m_CurrentDisplayObject->ToggleCollision(false);
+	}
+
+	if (m_CurrentDisplayObject != NULL)
+	{
+		m_CurrentDisplayObject->SetActorLocation(controller->GetLocationUnderCursor());
+	}
+
+	if (controller->IsLeftBtnPressed())
+	{
+		if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+		{
+			ABaseBlock* blocksUnder = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
+			if (blocksUnder != NULL)
+			{
+				blocksUnder->ChangeDisplayMode(ABaseBlock::Selected);
+				m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+			}
+		}
+	}
+	else if (controller->WasLeftBtnReleased())
+	{
+		SpawnSelectedObject();
+	}
+}
+
+void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
+{
+	m_CurrentSelectedBaseBlocks.AddUnique(block);
 }
 
 void FInnManager::LoadGame(FString slotName)
@@ -216,7 +247,42 @@ void FInnManager::ExitConstructMode()
 
 void FInnManager::SpawnFloorBlock()
 {
+	for (int i = 0;i<m_CurrentSelectedBaseBlocks.Num();++i)
+	{
+		UWorld* world = m_GameManager->GetAssociatedWorld();
+		if (world)
+		{
+			//TODO: Use AFActorSpawnParameters
+			//FActorSpawnParameters params;
+			FTransform spawnTrans = m_CurrentSelectedBaseBlocks[i]->GetTransform();
+			spawnTrans.AddToTranslation(FVector(0.f, 0.f, 3.f));//use majic number for now
+			AFloorBlock* spawnedCustomer = world->SpawnActor<AFloorBlock>(m_FloorBlockClass, spawnTrans);
+			//m_FloorBlockClass.Add(spawnedCustomer);
+		}
+	}
 
+	//Clear out selected blocks
+	m_CurrentSelectedBaseBlocks.Empty();
+}
+
+void FInnManager::SpawnSelectedObject()
+{
+	for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
+	{
+		UWorld* world = m_GameManager->GetAssociatedWorld();
+		if (world)
+		{
+			//TODO: Use AFActorSpawnParameters
+			//FActorSpawnParameters params;
+			FTransform spawnTrans = m_CurrentSelectedBaseBlocks[i]->GetTransform();
+			m_CurrentSelectedBaseBlocks[i]->ChangeDisplayMode(ABaseBlock::Normal);
+			AConstructableObject* spawnedObject = world->SpawnActor<AConstructableObject>(m_CurrentSelectedClass, spawnTrans);
+			//m_FloorBlockClass.Add(spawnedCustomer);
+		}
+	}
+
+	//Clear out selected blocks
+	m_CurrentSelectedBaseBlocks.Empty();
 }
 
 void FInnManager::SetSelectedClass(TSubclassOf<AConstructableObject> objectClass)

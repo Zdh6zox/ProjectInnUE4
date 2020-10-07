@@ -40,4 +40,9 @@ public:
 		void OnMouseFocusLeft();
 	void OnMouseFocusLeft_Implementation() override;
 
+	UFUNCTION(BlueprintNativeEvent)
+		bool CanReceiveInput();
+	bool CanReceiveInput_Implementation() override;
+
+	virtual void ToggleCollision(bool enable) {}
 };

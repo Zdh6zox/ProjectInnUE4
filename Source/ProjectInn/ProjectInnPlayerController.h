@@ -11,6 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMouseLeftBtnClickedOneParam, AActor*, focusedReceivableActor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMouseFocusedOneParam, AActor*, focusedReceivableActor);
 
+class IInputReceivableObject;
 UCLASS()
 class AProjectInnPlayerController : public APlayerController
 {
@@ -30,6 +31,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FOnMouseFocusedOneParam MouseFocusedOneParamDel;
+
+
+	bool IsLeftBtnPressed();
+	bool WasLeftBtnReleased();
+	FVector GetLocationUnderCursor();
+	IInputReceivableObject* GetObjectUnderCursor();
 
 protected:
 	///** True if the controlled character should navigate to the mouse cursor. */
@@ -60,11 +67,9 @@ protected:
 
 	bool IsCursorSnapOnScreenEdge(FVector& cameraMovement);
 
-	bool IsLeftBtnPressed();
-	bool WasLeftBtnReleased();
-
 private:
 	TWeakObjectPtr<AActor> m_PreFocusedObject;
+	FVector m_HittedLocation;
 };
 
 

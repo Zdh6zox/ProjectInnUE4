@@ -28,6 +28,7 @@ public:
 	ACounter* FindCounter();
 
 	void SpawnFloorBlock();
+	void SpawnSelectedObject();
 
 	void EnterConstructMode();
 	void ExitConstructMode();
@@ -37,6 +38,8 @@ public:
 	void UpdateConstructMode();
 
 	void RegisterCounter(ACounter* counter);
+
+	void AddSelectedBaseBlock(ABaseBlock* block);
 
 	void SaveGame(FString slotName);
 	void LoadGame(FString slotName);
@@ -49,6 +52,10 @@ public:
 	void ClearCurrentTableData();
 	void AddTableData(FTableData tableData);
 
+	void OnLeftBtnPressed();
+
+	EInnManagerMode GetInnManagerMode() const { return m_CurrentMode; }
+
 private:
 	TArray<ATable*> m_CurrentTables;
 	TArray<ABaseBlock*> m_BaseBlocks;
@@ -60,5 +67,6 @@ private:
 	EInnManagerMode m_CurrentMode;
 
 	TSubclassOf<AConstructableObject> m_CurrentSelectedClass;
+	TArray<ABaseBlock*> m_CurrentSelectedBaseBlocks;
 	AConstructableObject* m_CurrentDisplayObject;
 };

@@ -2,6 +2,7 @@
 
 
 #include "ConstructableObject.h"
+#include "Manager/GameManager.h"
 
 // Sets default values
 AConstructableObject::AConstructableObject()
@@ -44,4 +45,9 @@ void AConstructableObject::OnMouseLeftBtnClicked_Implementation(AActor* focusedA
 void AConstructableObject::OnMouseFocusLeft_Implementation()
 {
 	//OnMouseFocusLeft_BP();
+}
+
+bool AConstructableObject::CanReceiveInput_Implementation()
+{
+	return AGameManager::GetGameManager(GetWorld())->GetInnManager().GetInnManagerMode() == EInnManagerMode::Normal;
 }

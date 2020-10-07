@@ -28,4 +28,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 		void OnMouseFocusLeft();
+
+	UFUNCTION(BlueprintNativeEvent)
+		bool CanReceiveInput();
 };

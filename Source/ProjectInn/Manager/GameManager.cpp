@@ -109,5 +109,5 @@ void AGameManager::ChangeInnManagerMode(EInnManagerMode mode)
 
 void AGameManager::SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass)
 {
-	
+	m_InnManager.SetSelectedClass(selectedClass);
 }

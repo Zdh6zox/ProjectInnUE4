@@ -16,3 +16,8 @@ void AFloorBlock::InitializeBlockWithMaterial(EFloorBlockMaterial matType)
 
 	AGameManager::GetGameManager(GetWorld())->GetInnManager();
 }
+
+void AFloorBlock::ToggleCollision(bool enable)
+{
+	ToggleCollision_BP(enable);
+}
