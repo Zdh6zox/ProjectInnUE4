@@ -38,6 +38,40 @@ void AGameManager::InitializeManager()
 	m_InnManager.InitializeManager(this);
 }
 
+AGameManager* AGameManager::GetGameManager(UWorld* world)
+{
+	for (TActorIterator<AGameManager> It(world, AGameManager::StaticClass()); It; ++It)
+	{
+		AGameManager* gameManager = *It;
+		return gameManager;
+	}
+
+	return nullptr;
+}
+
+void AGameManager::ChangeInnManagerMode(EInnManagerMode mode)
+{
+	switch (mode)
+	{
+	case EInnManagerMode::Normal:
+		m_InnManager.ExitConstructMode();
+		break;
+	case EInnManagerMode::Construct:
+		m_InnManager.EnterConstructMode();
+		break;
+	case EInnManagerMode::Decorate:
+		break;
+	default:
+		break;
+	}
+}
+
+void AGameManager::SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass)
+{
+	m_InnManager.SetSelectedClass(selectedClass);
+}
+
+//------------------------------------------------------------------------------
 //Test Functions
 void AGameManager::Test_SpawnCustomer(const FVector& refPos, const FRotator& refRot)
 {
@@ -74,40 +108,12 @@ void AGameManager::Test_SaveGame(FString slotName)
 	m_InnManager.SaveGame(slotName);
 }
 
-AGameManager* AGameManager::GetGameManager(UWorld* world)
-{
-	for (TActorIterator<AGameManager> It(world, AGameManager::StaticClass()); It; ++It)
-	{
-		AGameManager* gameManager = *It;
-		return gameManager;
-	}
-
-	return nullptr;
-}
-
 UMaterial* AGameManager::Test_LoadFloorBlockMat(EFloorBlockMaterial mat)
 {
 	return m_InnManager.LoadFloorBlockAssetMat(mat);
 }
 
-void AGameManager::ChangeInnManagerMode(EInnManagerMode mode)
+void AGameManager::Test_OrganizeBaseBlocks()
 {
-	switch (mode)
-	{
-	case EInnManagerMode::Normal:
-		m_InnManager.ExitConstructMode();
-		break;
-	case EInnManagerMode::Construct:
-		m_InnManager.EnterConstructMode();
-		break;
-	case EInnManagerMode::Decorate:
-		break;
-	default:
-		break;
-	}
-}
-
-void AGameManager::SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass)
-{
-	m_InnManager.SetSelectedClass(selectedClass);
+	m_InnManager.OrganizeBaseBlocks();
 }

@@ -43,10 +43,13 @@ void FInnManager::InitializeManager(AGameManager* gm)
 
 	//Clear out old data
 	m_CurrentTables.Empty();
+	m_CurrentSelectedBaseBlocks.Empty();
 	m_BaseBlocks.Empty();
 
 	m_CurrentSelectedClass = NULL;
 	m_CurrentDisplayObject = NULL;
+	m_StartBaseBlock = NULL;
+	m_EndBaseBlock = NULL;
 	m_CurrentMode = EInnManagerMode::Normal;
 
 	TArray<AActor*> foundBaseBlocks;
@@ -57,6 +60,11 @@ void FInnManager::InitializeManager(AGameManager* gm)
 		ABaseBlock* baseBlock = Cast<ABaseBlock>(foundBaseBlocks[i]);
 		m_BaseBlocks.Add(baseBlock);
 	}
+}
+
+void FInnManager::OrganizeBaseBlocks()
+{
+
 }
 
 void FInnManager::SaveGame(FString slotName)
@@ -126,13 +134,31 @@ void FInnManager::UpdateConstructMode()
 
 	if (controller->IsLeftBtnPressed())
 	{
-		if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+		if (m_StartBaseBlock == NULL)
 		{
-			ABaseBlock* blocksUnder = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
-			if (blocksUnder != NULL)
+			m_StartBaseBlock = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
+			if (m_StartBaseBlock != NULL)
 			{
-				blocksUnder->ChangeDisplayMode(ABaseBlock::Selected);
-				m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+				m_StartBaseBlock->ChangeDisplayMode(ABaseBlock::Selected);
+				//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+			}
+		}
+		else if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+		{
+			ABaseBlock* endBaseBlock = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
+			if (m_EndBaseBlock != endBaseBlock)
+			{
+				if (m_EndBaseBlock != NULL && m_EndBaseBlock != m_StartBaseBlock)
+				{
+					m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Normal);
+				}
+
+				m_EndBaseBlock = endBaseBlock;
+				if (m_EndBaseBlock != NULL)
+				{
+					m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Selected);
+					//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+				}
 			}
 		}
 	}
@@ -140,6 +166,12 @@ void FInnManager::UpdateConstructMode()
 	{
 		SpawnSelectedObject();
 	}
+}
+
+void FInnManager::UpdateSelectedBaseBlock()
+{
+	//Update selected blocks via selected class
+
 }
 
 void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
@@ -283,6 +315,17 @@ void FInnManager::SpawnSelectedObject()
 
 	//Clear out selected blocks
 	m_CurrentSelectedBaseBlocks.Empty();
+	if (m_StartBaseBlock != NULL)
+	{
+		m_StartBaseBlock->ChangeDisplayMode(ABaseBlock::Normal);
+	}
+	if (m_EndBaseBlock != NULL)
+	{
+		m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Normal);
+	}
+
+	m_StartBaseBlock = NULL;
+	m_EndBaseBlock = NULL;
 }
 
 void FInnManager::SetSelectedClass(TSubclassOf<AConstructableObject> objectClass)

@@ -49,6 +49,18 @@ public:
 	UPROPERTY()
 		TArray<AConstructableObject*> ObjectsOnThisBlock;
 
+	UPROPERTY(EditAnywhere, category = "Neighbour Blocks")
+		ABaseBlock* LeftBlock;
+
+	UPROPERTY(EditAnywhere, category = "Neighbour Blocks")
+		ABaseBlock* RightBlock;
+
+	UPROPERTY(EditAnywhere, category = "Neighbour Blocks")
+		ABaseBlock* UpBlock;
+
+	UPROPERTY(EditAnywhere, category = "Neighbour Blocks")
+		ABaseBlock* DownBlock;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -76,6 +88,8 @@ public:
 	bool CanReceiveInput_Implementation() override;
 
 	bool CanAddConstructObject(AConstructableObject* objectToAdd);
+
+	void SetSelected(bool isSelected);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

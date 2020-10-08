@@ -53,6 +53,11 @@ void ABaseBlock::OnMouseFocusLeft_Implementation()
 	}
 }
 
+void ABaseBlock::SetSelected(bool isSelected)
+{
+	m_IsSelected = isSelected;
+}
+
 void ABaseBlock::OnMouseLeftBtnClicked_Implementation(AActor* focusedActor)
 {
 

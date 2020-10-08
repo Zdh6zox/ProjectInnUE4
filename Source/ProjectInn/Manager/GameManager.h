@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable, category = "Test Function")
 		UMaterial* Test_LoadFloorBlockMat(EFloorBlockMaterial mat);
 
+	UFUNCTION(BlueprintCallable, category = "Test Function")
+		void Test_OrganizeBaseBlocks();
+
 	UFUNCTION(BlueprintCallable, category = "Inn Manager")
 		void ChangeInnManagerMode(EInnManagerMode mode);
 

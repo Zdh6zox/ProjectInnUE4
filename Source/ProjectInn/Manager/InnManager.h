@@ -56,7 +56,11 @@ public:
 
 	EInnManagerMode GetInnManagerMode() const { return m_CurrentMode; }
 
+	void OrganizeBaseBlocks();
+
 private:
+	void UpdateSelectedBaseBlock();
+
 	TArray<ATable*> m_CurrentTables;
 	TArray<ABaseBlock*> m_BaseBlocks;
 	TWeakObjectPtr<AGameManager> m_GameManager;
@@ -67,6 +71,9 @@ private:
 	EInnManagerMode m_CurrentMode;
 
 	TSubclassOf<AConstructableObject> m_CurrentSelectedClass;
+	ABaseBlock* m_StartBaseBlock;
+	ABaseBlock* m_EndBaseBlock;
+
 	TArray<ABaseBlock*> m_CurrentSelectedBaseBlocks;
 	AConstructableObject* m_CurrentDisplayObject;
 };
