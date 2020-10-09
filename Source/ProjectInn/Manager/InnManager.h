@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SharedEnumTypes.h"
+#include "InteractableObjects/Inn/BaseBlock.h"
 
 class ATable;
 class AGameManager;
@@ -11,7 +12,6 @@ class UInnData;
 class FTableSearchRequest;
 class ACounter;
 class AFloorBlock;
-class ABaseBlock;
 class UMaterial;
 class AConstructableObject;
 struct FTableData;
@@ -21,6 +21,7 @@ struct FTableData;
 class PROJECTINN_API FInnManager
 {
 public:
+
 	void InitializeManager(AGameManager* gm);
 
 	void SpawnTables();
@@ -62,7 +63,6 @@ private:
 	void UpdateSelectedBaseBlock();
 
 	TArray<ATable*> m_CurrentTables;
-	TArray<ABaseBlock*> m_BaseBlocks;
 	TWeakObjectPtr<AGameManager> m_GameManager;
 	UInnData* m_CurrentInnSaveData;
 	TSubclassOf<ATable> m_TableClass;
@@ -75,5 +75,10 @@ private:
 	ABaseBlock* m_EndBaseBlock;
 
 	TArray<ABaseBlock*> m_CurrentSelectedBaseBlocks;
+	TMap<FBlockCoordinate, ABaseBlock*> m_ConstructBaseBlockMap;
 	AConstructableObject* m_CurrentDisplayObject;
+
+#ifdef WITH_EDITOR
+	TArray<ABaseBlock*> m_BaseBlocks;
+#endif
 };

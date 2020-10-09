@@ -44,7 +44,7 @@ void FInnManager::InitializeManager(AGameManager* gm)
 	//Clear out old data
 	m_CurrentTables.Empty();
 	m_CurrentSelectedBaseBlocks.Empty();
-	m_BaseBlocks.Empty();
+	m_ConstructBaseBlockMap.Empty();
 
 	m_CurrentSelectedClass = NULL;
 	m_CurrentDisplayObject = NULL;
@@ -58,13 +58,63 @@ void FInnManager::InitializeManager(AGameManager* gm)
 	for (int i = 0; i < foundBaseBlocks.Num(); ++i)
 	{
 		ABaseBlock* baseBlock = Cast<ABaseBlock>(foundBaseBlocks[i]);
+		m_ConstructBaseBlockMap.Add(baseBlock->BlockCoordinate, baseBlock);
+#ifdef WITH_EDITOR
 		m_BaseBlocks.Add(baseBlock);
+#endif
 	}
 }
 
 void FInnManager::OrganizeBaseBlocks()
 {
+#ifdef WITH_EDITOR
+	m_BaseBlocks.Sort([](const ABaseBlock& A, const ABaseBlock& B)
+	{
+		if (A.GetActorLocation().X > B.GetActorLocation().X)
+		{
+			return true;
+		}
+		else if (A.GetActorLocation().X < B.GetActorLocation().X)
+		{
+			return false;
+		}
+		else
+		{
+			return A.GetActorLocation().Y < B.GetActorLocation().Y;
+		}
+	});
 
+	float curX = 0.f;
+	if (m_BaseBlocks.Num() > 0)
+	{
+		curX = m_BaseBlocks[0]->GetActorLocation().X;
+	}
+
+	int xInx = 0;
+	int yInx = 0;
+	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	{
+		ABaseBlock* block = m_BaseBlocks[i];
+
+		if (curX == block->GetActorLocation().X)
+		{
+			block->BlockCoordinate.X = xInx;
+			block->BlockCoordinate.Y = yInx;
+			yInx++;
+		}
+		else
+		{
+			xInx++;
+			yInx = 0;
+			block->BlockCoordinate.X = xInx;
+			block->BlockCoordinate.Y = yInx;
+			yInx++;
+			curX = block->GetActorLocation().X;
+		}
+	}
+
+	
+#endif
 }
 
 void FInnManager::SaveGame(FString slotName)
@@ -158,6 +208,7 @@ void FInnManager::UpdateConstructMode()
 				{
 					m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Selected);
 					//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+					UpdateSelectedBaseBlock();
 				}
 			}
 		}
@@ -171,7 +222,66 @@ void FInnManager::UpdateConstructMode()
 void FInnManager::UpdateSelectedBaseBlock()
 {
 	//Update selected blocks via selected class
+	if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+	{
+		for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
+		{
+			m_CurrentSelectedBaseBlocks[i]->ChangeDisplayMode(ABaseBlock::Normal);
+		}
 
+		m_CurrentSelectedBaseBlocks.Empty();
+
+		if (m_StartBaseBlock != NULL)
+		{
+			m_CurrentSelectedBaseBlocks.AddUnique(m_StartBaseBlock);
+		}
+		if (m_EndBaseBlock != NULL)
+		{
+			uint32 startX = m_StartBaseBlock->BlockCoordinate.X;
+			uint32 startY = m_StartBaseBlock->BlockCoordinate.Y;
+			uint32 endX = m_EndBaseBlock->BlockCoordinate.X;
+			uint32 endY = m_EndBaseBlock->BlockCoordinate.Y;
+
+			uint32 smallX = startX;
+			uint32 bigX = startX;
+			uint32 smallY = startY;
+			uint32 bigY = startY;
+			if (startX >= endX)
+			{
+				smallX = endX;
+				bigX = startX;
+			}
+			else
+			{
+				smallX = startX;
+				bigX = endX;
+			}
+
+			if (startY >= endY)
+			{
+				smallY = endY;
+				bigY = startY;
+			}
+			else
+			{
+				smallY = startY;
+				bigY = endY;
+			}
+
+			for (uint32 i = smallX; i <= bigX; ++i)
+			{
+				for (uint32 j = smallY; j <= bigY; ++j)
+				{
+					FBlockCoordinate coordinateToFind;
+					coordinateToFind.X = i;
+					coordinateToFind.Y = j;
+					ABaseBlock* foundBlock = *(m_ConstructBaseBlockMap.Find(coordinateToFind));
+					foundBlock->ChangeDisplayMode(ABaseBlock::Selected);
+					m_CurrentSelectedBaseBlocks.Add(foundBlock);
+				}
+			}
+		}
+	}
 }
 
 void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
@@ -255,12 +365,10 @@ void FInnManager::EnterConstructMode()
 {
 	m_CurrentMode = EInnManagerMode::Construct;
 
-	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	for (auto& elem : m_ConstructBaseBlockMap)
 	{
-		if (ABaseBlock* block = m_BaseBlocks[i])
-		{
-			block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Normal);
-		}
+		ABaseBlock* block = elem.Value;
+		block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Normal);
 	}
 }
 
@@ -268,12 +376,10 @@ void FInnManager::ExitConstructMode()
 {
 	m_CurrentMode = EInnManagerMode::Normal;
 
-	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	for (auto& elem : m_ConstructBaseBlockMap)
 	{
-		if (ABaseBlock* block = m_BaseBlocks[i])
-		{
-			block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Transparent);
-		}
+		ABaseBlock* block = elem.Value;
+		block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Transparent);
 	}
 }
 
