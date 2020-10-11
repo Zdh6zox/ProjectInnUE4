@@ -64,11 +64,23 @@ public:
 	UFUNCTION(BlueprintCallable, category = "Test Function")
 		void Test_OrganizeBaseBlocks();
 
+	UFUNCTION(BlueprintCallable, category = "Test Function")
+		void Test_ResetSaveData();
+
 	UFUNCTION(BlueprintCallable, category = "Inn Manager")
 		void ChangeInnManagerMode(EInnManagerMode mode);
 
 	UFUNCTION(BlueprintCallable, category = "Inn Manager")
-		void SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass);
+		void SetCurrentSelectedClass(TSubclassOf<AConstructableObject> objectClass);
+
+	UFUNCTION(BlueprintCallable, category = "Inn Manager")
+		TSubclassOf<AConstructableObject> LoadObjectClassViaTypeAndLevel(EConstructableObjectType objectType, int level);
+
+	UFUNCTION(BlueprintCallable, category = "Inn Manager")
+		void SetCurrentLayer(int layerNumber);
+
+	UFUNCTION(BlueprintCallable, category = "Inn Manager")
+		void SpawnFromSavedData();
 
 	UPROPERTY(VisibleAnywhere, Transient)
 		TArray<ACustomer*> AllCustomers;

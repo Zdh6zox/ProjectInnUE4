@@ -3,7 +3,9 @@
 
 #include "GameManager.h"
 #include "Character/Customer/CustomerData.h"
+#include "Manager/InnData.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AGameManager::AGameManager()
@@ -66,9 +68,24 @@ void AGameManager::ChangeInnManagerMode(EInnManagerMode mode)
 	}
 }
 
-void AGameManager::SetSelectedClass(TSubclassOf<AConstructableObject> selectedClass)
+void AGameManager::SetCurrentSelectedClass(TSubclassOf<AConstructableObject> objectClass)
 {
-	m_InnManager.SetSelectedClass(selectedClass);
+	m_InnManager.SetSelectedClass(objectClass);
+}
+
+TSubclassOf<AConstructableObject> AGameManager::LoadObjectClassViaTypeAndLevel(EConstructableObjectType objectType, int level)
+{
+	return m_InnManager.LoadClassViaTypeAndLevel(objectType, level);
+}
+
+void AGameManager::SetCurrentLayer(int layerNumber)
+{
+	m_InnManager.SetCurrentLayer(layerNumber);
+}
+
+void AGameManager::SpawnFromSavedData()
+{
+	m_InnManager.SpawnFromSavedData();
 }
 
 //------------------------------------------------------------------------------
@@ -116,4 +133,11 @@ UMaterial* AGameManager::Test_LoadFloorBlockMat(EFloorBlockMaterial mat)
 void AGameManager::Test_OrganizeBaseBlocks()
 {
 	m_InnManager.OrganizeBaseBlocks();
+}
+
+void AGameManager::Test_ResetSaveData()
+{
+	UInnData* newInnData = NewObject<UInnData>();
+	UGameplayStatics::SaveGameToSlot(newInnData, "Slot1", 0);
+	m_InnManager.ResetSaveData();
 }

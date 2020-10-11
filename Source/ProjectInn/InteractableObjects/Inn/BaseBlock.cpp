@@ -5,6 +5,7 @@
 #include "Manager/GameManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ConstructableObject.h"
+#include "Data/ConstructableObjectData.h"
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -101,4 +102,21 @@ void ABaseBlock::ChangeDisplayMode(EBaseBlockDisplayMode displayMode)
 	default:
 		break;
 	}
+}
+
+bool ABaseBlock::CanPlace(EConstructableObjectType objectType, int layer) const
+{
+	if (objectType == EConstructableObjectType::Floor)
+	{
+		for (int i = 0; i < ObjectsOnThisBlock.Num(); ++i)
+		{
+			AConstructableObject* innObject = ObjectsOnThisBlock[i];
+			if (innObject->ObjectData.Type == objectType && innObject->ObjectData.Layer == layer)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
 }

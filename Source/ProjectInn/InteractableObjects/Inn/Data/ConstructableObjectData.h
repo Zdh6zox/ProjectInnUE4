@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h" 
 #include "UObject/NoExportTypes.h"
+#include "BaseBlockData.h"
 #include "SharedEnumTypes.h"
 #include "ConstructableObjectData.generated.h"
 
@@ -24,14 +25,24 @@ public:
 		int Level;
 
 	UPROPERTY(EditAnywhere)
+		int Layer;
+
+	UPROPERTY(EditAnywhere)
 		int SizeX;
 
 	UPROPERTY(EditAnywhere)
 		int SizeY;
 
 	UPROPERTY(EditAnywhere)
-		TArray<int> OccupiedBlockIndices;
+		FBlockCoordinate OriginLocation;
 
 	UPROPERTY(EditAnywhere)
 		float DamageDegree;
+
+	FORCEINLINE friend bool operator==(const FConstructableObjectData& lhs, const FConstructableObjectData& rhs)
+	{
+		return (lhs.Type == rhs.Type) && (lhs.Level == rhs.Level)
+			&& (lhs.Layer == rhs.Layer) && (lhs.SizeX == rhs.SizeX) && (lhs.SizeY == rhs.SizeY)
+			&& (lhs.OriginLocation == rhs.OriginLocation) && (lhs.DamageDegree == rhs.DamageDegree);
+	}
 };

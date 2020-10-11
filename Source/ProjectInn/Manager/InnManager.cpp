@@ -10,6 +10,7 @@
 #include "InteractableObjects/Inn/Counter.h"
 #include "InteractableObjects/Inn/FloorBlock.h"
 #include "InteractableObjects/Inn/BaseBlock.h"
+#include "InteractableObjects/Inn/Data/InnConstructableObjectAssetData.h"
 #include "Materials/Material.h"
 #include "UObject/ConstructorHelpers.h"
 #include "ProjectInnPlayerController.h"
@@ -52,6 +53,11 @@ void FInnManager::InitializeManager(AGameManager* gm)
 	m_EndBaseBlock = NULL;
 	m_CurrentMode = EInnManagerMode::Normal;
 
+
+	//Do initialize
+	FString tablePath = "DataTable'/Game/DataTable/Inn/InnAssetTable.InnAssetTable'";
+	m_AssetDataTable = LoadObject<UDataTable>(NULL, *tablePath);
+
 	TArray<AActor*> foundBaseBlocks;
 	UGameplayStatics::GetAllActorsOfClass(m_GameManager.Get(), ABaseBlock::StaticClass(), foundBaseBlocks);
 
@@ -63,6 +69,8 @@ void FInnManager::InitializeManager(AGameManager* gm)
 		m_BaseBlocks.Add(baseBlock);
 #endif
 	}
+
+
 }
 
 void FInnManager::OrganizeBaseBlocks()
@@ -123,6 +131,8 @@ void FInnManager::SaveGame(FString slotName)
 	{
 		m_CurrentInnSaveData = NewObject<UInnData>();
 	}
+
+	SaveObjectsData();
 
 	UGameplayStatics::SaveGameToSlot(m_CurrentInnSaveData, slotName, 0);
 }
@@ -276,12 +286,24 @@ void FInnManager::UpdateSelectedBaseBlock()
 					coordinateToFind.X = i;
 					coordinateToFind.Y = j;
 					ABaseBlock* foundBlock = *(m_ConstructBaseBlockMap.Find(coordinateToFind));
-					foundBlock->ChangeDisplayMode(ABaseBlock::Selected);
-					m_CurrentSelectedBaseBlocks.Add(foundBlock);
+					if (foundBlock->CanPlace(m_CurrentObjectType,m_CurrentLayerNumber))
+					{
+						foundBlock->ChangeDisplayMode(ABaseBlock::Selected);
+						m_CurrentSelectedBaseBlocks.AddUnique(foundBlock);
+					}
+					else
+					{
+						foundBlock->ChangeDisplayMode(ABaseBlock::Error);
+					}
 				}
 			}
 		}
 	}
+}
+
+void FInnManager::ResetSaveData()
+{
+	m_CurrentInnSaveData = Cast<UInnData>(UGameplayStatics::LoadGameFromSlot("Slot1", 0));
 }
 
 void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
@@ -292,6 +314,11 @@ void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
 void FInnManager::LoadGame(FString slotName)
 {
 
+}
+
+void FInnManager::SetCurrentLayer(int layerNumber)
+{
+	m_CurrentLayerNumber = layerNumber;
 }
 
 ATable* FInnManager::FindTable(FTableSearchRequest request)
@@ -385,7 +412,7 @@ void FInnManager::ExitConstructMode()
 
 void FInnManager::SpawnFloorBlock()
 {
-	for (int i = 0;i<m_CurrentSelectedBaseBlocks.Num();++i)
+	for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
 	{
 		UWorld* world = m_GameManager->GetAssociatedWorld();
 		if (world)
@@ -415,6 +442,11 @@ void FInnManager::SpawnSelectedObject()
 			FTransform spawnTrans = m_CurrentSelectedBaseBlocks[i]->GetTransform();
 			m_CurrentSelectedBaseBlocks[i]->ChangeDisplayMode(ABaseBlock::Normal);
 			AConstructableObject* spawnedObject = world->SpawnActor<AConstructableObject>(m_CurrentSelectedClass, spawnTrans);
+			spawnedObject->ObjectData.Layer = m_CurrentLayerNumber;
+			spawnedObject->ObjectData.OriginLocation = m_CurrentSelectedBaseBlocks[i]->BlockCoordinate;
+			m_CurrentSelectedBaseBlocks[i]->ObjectsOnThisBlock.Add(spawnedObject);
+
+			m_CurrentObjects.AddUnique(spawnedObject);
 			//m_FloorBlockClass.Add(spawnedCustomer);
 		}
 	}
@@ -434,10 +466,65 @@ void FInnManager::SpawnSelectedObject()
 	m_EndBaseBlock = NULL;
 }
 
+void FInnManager::SaveObjectsData()
+{
+	for (AConstructableObject* innObject : m_CurrentObjects)
+	{
+		m_CurrentInnSaveData->ConstructableObjectsData.Add(innObject->ObjectData);
+	}
+}
+
+void FInnManager::SpawnFromSavedData()
+{
+	if (m_CurrentInnSaveData == NULL)
+	{
+		UE_LOG(LogProjectInn, Error, TEXT("Inn Save Data Table is NULL, when try to spawn objects from save data"));
+		return;
+	}
+
+	UWorld* world = m_GameManager->GetAssociatedWorld();
+
+	for (const FConstructableObjectData& objectData : m_CurrentInnSaveData->ConstructableObjectsData)
+	{
+		ABaseBlock* foundBlock = *(m_ConstructBaseBlockMap.Find(objectData.OriginLocation));
+		if (foundBlock != NULL)
+		{
+			FTransform spawnTrans = foundBlock->GetTransform();
+
+			TSubclassOf<AConstructableObject> objectClass = LoadClassViaTypeAndLevel(objectData.Type, objectData.Level);
+
+			AConstructableObject* spawnedObject = world->SpawnActor<AConstructableObject>(objectClass, spawnTrans);
+			foundBlock->ObjectsOnThisBlock.Add(spawnedObject);
+			m_CurrentObjects.AddUnique(spawnedObject);
+		}
+	}
+}
+
 void FInnManager::SetSelectedClass(TSubclassOf<AConstructableObject> objectClass)
 {
 	m_CurrentSelectedClass = objectClass;
 
 	//Spawn display actor under cursor
 
+}
+
+TSubclassOf<AConstructableObject> FInnManager::LoadClassViaTypeAndLevel(EConstructableObjectType objectType, int level)
+{
+	if (m_AssetDataTable == NULL)
+	{
+		UE_LOG(LogProjectInn, Error, TEXT("Inn Asset Data Table is NULL"));
+		return NULL;
+	}
+
+	TArray<FName> rowNames = m_AssetDataTable->GetRowNames();
+	for (auto& rowName : rowNames)
+	{
+		FInnConstructableObjectAssetData* row = m_AssetDataTable->FindRow<FInnConstructableObjectAssetData>(rowName,"");
+		if (row != nullptr && row->ObjectType == objectType && row->Level == level)
+		{
+			return row->TemplateClass;
+		}
+	}
+
+	return NULL;
 }

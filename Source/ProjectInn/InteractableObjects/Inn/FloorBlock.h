@@ -19,7 +19,10 @@ public:
 	AFloorBlock();
 
 	UPROPERTY(EditAnywhere)
-	EFloorBlockMaterial BlockMaterial = EFloorBlockMaterial::Mud;
+		EFloorBlockMaterial BlockMaterial = EFloorBlockMaterial::Mud;
+
+	UPROPERTY(EditAnywhere)
+		int FloorLayer;
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ToggleCollision_BP(bool enable);

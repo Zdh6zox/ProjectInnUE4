@@ -6,36 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Data/BaseBlockData.h"
 #include "InputReceivableObject.h"
+#include "SharedEnumTypes.h"
 #include "BaseBlock.generated.h"
 
 
 class UStaticMeshComponent;
 class AConstructableObject;
-USTRUCT(BlueprintType)
-struct FBlockCoordinate
-{
-	GENERATED_USTRUCT_BODY();
-
-	UPROPERTY(EditAnywhere)
-	uint32 X = 0;
-
-	UPROPERTY(EditAnywhere)
-	uint32 Y = 0;
-
-	FORCEINLINE friend bool operator==(const FBlockCoordinate& lhs, const FBlockCoordinate& rhs)
-	{
-		return (lhs.X == rhs.X) && (lhs.Y == rhs.Y);
-	}
-
-	FORCEINLINE friend uint32 GetTypeHash(const FBlockCoordinate& key)
-	{
-		uint32 hash = 0;
-		hash = HashCombine(hash, GetTypeHash(key.X));
-		hash = HashCombine(hash, GetTypeHash(key.Y));
-
-		return hash;
-	}
-};
 
 UCLASS()
 class PROJECTINN_API ABaseBlock : public AActor, public IInputReceivableObject
@@ -113,9 +89,9 @@ public:
 		bool CanReceiveInput();
 	bool CanReceiveInput_Implementation() override;
 
-	bool CanAddConstructObject(AConstructableObject* objectToAdd);
-
 	void SetSelected(bool isSelected);
+
+	bool CanPlace(EConstructableObjectType objectType, int layer) const;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

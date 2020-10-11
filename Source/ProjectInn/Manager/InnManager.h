@@ -21,7 +21,6 @@ struct FTableData;
 class PROJECTINN_API FInnManager
 {
 public:
-
 	void InitializeManager(AGameManager* gm);
 
 	void SpawnTables();
@@ -44,20 +43,24 @@ public:
 
 	void SaveGame(FString slotName);
 	void LoadGame(FString slotName);
+	void ResetSaveData();
 
 	UMaterial* LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat);
 
 	void SetSelectedClass(TSubclassOf<AConstructableObject> objectClass);
+	TSubclassOf<AConstructableObject> LoadClassViaTypeAndLevel(EConstructableObjectType objectType, int level);
+	void SetCurrentLayer(int layerNumber);
 
 	//Dev Functions
 	void ClearCurrentTableData();
 	void AddTableData(FTableData tableData);
 
-	void OnLeftBtnPressed();
-
 	EInnManagerMode GetInnManagerMode() const { return m_CurrentMode; }
 
 	void OrganizeBaseBlocks();
+
+	void SpawnFromSavedData();
+	void SaveObjectsData();
 
 private:
 	void UpdateSelectedBaseBlock();
@@ -77,6 +80,14 @@ private:
 	TArray<ABaseBlock*> m_CurrentSelectedBaseBlocks;
 	TMap<FBlockCoordinate, ABaseBlock*> m_ConstructBaseBlockMap;
 	AConstructableObject* m_CurrentDisplayObject;
+
+	TArray<AConstructableObject*> m_CurrentObjects;
+
+	UDataTable* m_AssetDataTable;
+
+	int m_CurrentLayerNumber;
+	int m_CurrentObjectLevel;
+	EConstructableObjectType m_CurrentObjectType;
 
 #ifdef WITH_EDITOR
 	TArray<ABaseBlock*> m_BaseBlocks;
