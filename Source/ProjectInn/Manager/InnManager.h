@@ -26,8 +26,6 @@ public:
 	void SpawnTables();
 	ATable* FindTable(FTableSearchRequest request);
 	ACounter* FindCounter();
-
-	void SpawnFloorBlock();
 	void SpawnSelectedObject();
 
 	void EnterConstructMode();
@@ -37,30 +35,21 @@ public:
 
 	void UpdateConstructMode();
 
-	void RegisterCounter(ACounter* counter);
-
-	void AddSelectedBaseBlock(ABaseBlock* block);
-
 	void SaveGame(FString slotName);
 	void LoadGame(FString slotName);
 	void ResetSaveData();
-
-	UMaterial* LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat);
 
 	void SetSelectedClass(TSubclassOf<AConstructableObject> objectClass);
 	TSubclassOf<AConstructableObject> LoadClassViaTypeAndLevel(EConstructableObjectType objectType, int level);
 	void SetCurrentLayer(int layerNumber);
 
-	//Dev Functions
-	void ClearCurrentTableData();
-	void AddTableData(FTableData tableData);
-
 	EInnManagerMode GetInnManagerMode() const { return m_CurrentMode; }
-
-	void OrganizeBaseBlocks();
 
 	void SpawnFromSavedData();
 	void SaveObjectsData();
+
+	//Dev Function
+	void OrganizeBaseBlocks();
 
 private:
 	void UpdateSelectedBaseBlock();
@@ -70,7 +59,7 @@ private:
 	UInnData* m_CurrentInnSaveData;
 	TSubclassOf<ATable> m_TableClass;
 	TSubclassOf<AFloorBlock> m_FloorBlockClass;
-	TWeakObjectPtr<ACounter> m_Counter;
+	ACounter* m_Counter;
 	EInnManagerMode m_CurrentMode;
 
 	TSubclassOf<AConstructableObject> m_CurrentSelectedClass;

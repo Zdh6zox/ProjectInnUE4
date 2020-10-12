@@ -21,8 +21,5 @@ public:
 		int InnLevel;
 
 	UPROPERTY(EditAnywhere)
-		TArray<FTableData> Tables;
-
-	UPROPERTY(EditAnywhere)
 		TArray<FConstructableObjectData> ConstructableObjectsData;
 };

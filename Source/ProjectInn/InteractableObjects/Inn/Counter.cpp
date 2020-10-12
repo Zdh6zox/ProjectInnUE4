@@ -18,7 +18,6 @@ void ACounter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AGameManager::GetGameManager(GetWorld())->GetInnManager().RegisterCounter(this);
 }
 
 // Called every frame

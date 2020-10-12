@@ -73,97 +73,18 @@ void FInnManager::InitializeManager(AGameManager* gm)
 
 }
 
-void FInnManager::OrganizeBaseBlocks()
-{
-#ifdef WITH_EDITOR
-	m_BaseBlocks.Sort([](const ABaseBlock& A, const ABaseBlock& B)
-	{
-		if (A.GetActorLocation().X > B.GetActorLocation().X)
-		{
-			return true;
-		}
-		else if (A.GetActorLocation().X < B.GetActorLocation().X)
-		{
-			return false;
-		}
-		else
-		{
-			return A.GetActorLocation().Y < B.GetActorLocation().Y;
-		}
-	});
-
-	float curX = 0.f;
-	if (m_BaseBlocks.Num() > 0)
-	{
-		curX = m_BaseBlocks[0]->GetActorLocation().X;
-	}
-
-	int xInx = 0;
-	int yInx = 0;
-	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
-	{
-		ABaseBlock* block = m_BaseBlocks[i];
-
-		if (curX == block->GetActorLocation().X)
-		{
-			block->BlockCoordinate.X = xInx;
-			block->BlockCoordinate.Y = yInx;
-			yInx++;
-		}
-		else
-		{
-			xInx++;
-			yInx = 0;
-			block->BlockCoordinate.X = xInx;
-			block->BlockCoordinate.Y = yInx;
-			yInx++;
-			curX = block->GetActorLocation().X;
-		}
-	}
-
-	
-#endif
-}
-
 void FInnManager::SaveGame(FString slotName)
 {
 	if (m_CurrentInnSaveData == nullptr)
 	{
-		m_CurrentInnSaveData = NewObject<UInnData>();
+		m_CurrentInnSaveData = Cast<UInnData>(UGameplayStatics::CreateSaveGameObject(UInnData::StaticClass()));
 	}
 
-	SaveObjectsData();
-
-	UGameplayStatics::SaveGameToSlot(m_CurrentInnSaveData, slotName, 0);
-}
-
-void FInnManager::RegisterCounter(ACounter* counter)
-{
-	m_Counter = counter;
-}
-
-ACounter* FInnManager::FindCounter()
-{
-	return m_Counter.Get();
-}
-
-void FInnManager::SpawnTables()
-{
-	if (m_CurrentInnSaveData == nullptr)
+	if (m_CurrentInnSaveData != nullptr)
 	{
-		UE_LOG(LogProjectInn, Error, TEXT("Current save is null"));
-		return;
-	}
+		SaveObjectsData();
 
-	UWorld* world = m_GameManager->GetAssociatedWorld();
-	for (int i = 0; i < m_CurrentInnSaveData->Tables.Num(); ++i)
-	{
-		FTransform tableTrans = m_CurrentInnSaveData->Tables[i].TableTransform;
-
-		
-		ATable* spawnedTable = world->SpawnActor<ATable>(m_TableClass, tableTrans.GetLocation(), tableTrans.GetRotation().Rotator());
-		spawnedTable->InitializeTable(m_CurrentInnSaveData->Tables[i]);
-		//m_CurrentTables.Add(spawnedTable);
+		UGameplayStatics::SaveGameToSlot(m_CurrentInnSaveData, slotName, 0);
 	}
 }
 
@@ -173,6 +94,11 @@ void FInnManager::Tick()
 	{
 		UpdateConstructMode();
 	}
+}
+
+void FInnManager::SpawnTables()
+{
+
 }
 
 void FInnManager::UpdateConstructMode()
@@ -303,12 +229,8 @@ void FInnManager::UpdateSelectedBaseBlock()
 
 void FInnManager::ResetSaveData()
 {
+	m_CurrentInnSaveData->ConditionalBeginDestroy();
 	m_CurrentInnSaveData = Cast<UInnData>(UGameplayStatics::LoadGameFromSlot("Slot1", 0));
-}
-
-void FInnManager::AddSelectedBaseBlock(ABaseBlock* block)
-{
-	m_CurrentSelectedBaseBlocks.AddUnique(block);
 }
 
 void FInnManager::LoadGame(FString slotName)
@@ -334,58 +256,9 @@ ATable* FInnManager::FindTable(FTableSearchRequest request)
 	}
 }
 
-void FInnManager::AddTableData(FTableData tableData)
+ACounter* FInnManager::FindCounter()
 {
-	if (m_CurrentInnSaveData == nullptr)
-	{
-		m_CurrentInnSaveData = NewObject<UInnData>();
-	}
-
-	int index = m_CurrentInnSaveData->Tables.Num();
-	tableData.TableIndex = index;
-	m_CurrentInnSaveData->Tables.Add(tableData);
-}
-
-void FInnManager::ClearCurrentTableData()
-{
-	m_CurrentInnSaveData->Tables.Empty();
-}
-
-UMaterial* FInnManager::LoadFloorBlockAssetMat(EFloorBlockMaterial blockMat)
-{
-	FString assetDir = m_GameManager->FloorBlockAssetDir;
-	FString assetPath = assetDir;
-
-	switch (blockMat)
-	{
-	case EFloorBlockMaterial::Mud:
-		assetPath += "/Mud.Mud";
-		break;
-	case EFloorBlockMaterial::Plank:
-		assetPath += "/Plank.Plank";
-		break;
-	case EFloorBlockMaterial::Granite:
-		assetPath += "/Granite.Granite";
-		break;
-	case EFloorBlockMaterial::Bamboo:
-		assetPath += "/Bamboo.Bamboo";
-		break;
-	case EFloorBlockMaterial::Brick:
-		assetPath += "/Brick.Brick";
-		break;
-	case EFloorBlockMaterial::GoldenBrick:
-		assetPath += "/GoldenBrick.GoldenBrick";
-		break;
-	case EFloorBlockMaterial::Jade:
-		assetPath += "/Jade.Jade";
-		break;
-	default:
-		break;
-	}
-
-	UMaterial* loadedMat = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), NULL, *assetPath));
-
-	return loadedMat;
+	return m_Counter;
 }
 
 void FInnManager::EnterConstructMode()
@@ -410,26 +283,6 @@ void FInnManager::ExitConstructMode()
 	}
 }
 
-void FInnManager::SpawnFloorBlock()
-{
-	for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
-	{
-		UWorld* world = m_GameManager->GetAssociatedWorld();
-		if (world)
-		{
-			//TODO: Use AFActorSpawnParameters
-			//FActorSpawnParameters params;
-			FTransform spawnTrans = m_CurrentSelectedBaseBlocks[i]->GetTransform();
-			spawnTrans.AddToTranslation(FVector(0.f, 0.f, 3.f));//use majic number for now
-			AFloorBlock* spawnedCustomer = world->SpawnActor<AFloorBlock>(m_FloorBlockClass, spawnTrans);
-			//m_FloorBlockClass.Add(spawnedCustomer);
-		}
-	}
-
-	//Clear out selected blocks
-	m_CurrentSelectedBaseBlocks.Empty();
-}
-
 void FInnManager::SpawnSelectedObject()
 {
 	for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
@@ -446,7 +299,7 @@ void FInnManager::SpawnSelectedObject()
 			spawnedObject->ObjectData.OriginLocation = m_CurrentSelectedBaseBlocks[i]->BlockCoordinate;
 			m_CurrentSelectedBaseBlocks[i]->ObjectsOnThisBlock.Add(spawnedObject);
 
-			m_CurrentObjects.AddUnique(spawnedObject);
+			m_CurrentObjects.Add(spawnedObject);
 			//m_FloorBlockClass.Add(spawnedCustomer);
 		}
 	}
@@ -468,9 +321,15 @@ void FInnManager::SpawnSelectedObject()
 
 void FInnManager::SaveObjectsData()
 {
-	for (AConstructableObject* innObject : m_CurrentObjects)
+	m_CurrentInnSaveData->ConstructableObjectsData.Empty();
+
+	for (int i = 0; i < m_CurrentObjects.Num(); ++i)
 	{
-		m_CurrentInnSaveData->ConstructableObjectsData.Add(innObject->ObjectData);
+		AConstructableObject* innObject = m_CurrentObjects[i];
+		if (innObject != nullptr)
+		{
+			m_CurrentInnSaveData->ConstructableObjectsData.Add(innObject->ObjectData);
+		}
 	}
 }
 
@@ -494,8 +353,9 @@ void FInnManager::SpawnFromSavedData()
 			TSubclassOf<AConstructableObject> objectClass = LoadClassViaTypeAndLevel(objectData.Type, objectData.Level);
 
 			AConstructableObject* spawnedObject = world->SpawnActor<AConstructableObject>(objectClass, spawnTrans);
+			spawnedObject->ObjectData = objectData;
 			foundBlock->ObjectsOnThisBlock.Add(spawnedObject);
-			m_CurrentObjects.AddUnique(spawnedObject);
+			m_CurrentObjects.Add(spawnedObject);
 		}
 	}
 }
@@ -527,4 +387,57 @@ TSubclassOf<AConstructableObject> FInnManager::LoadClassViaTypeAndLevel(EConstru
 	}
 
 	return NULL;
+}
+
+//Dev Function
+void FInnManager::OrganizeBaseBlocks()
+{
+#ifdef WITH_EDITOR
+	m_BaseBlocks.Sort([](const ABaseBlock& A, const ABaseBlock& B)
+	{
+		if (A.GetActorLocation().X > B.GetActorLocation().X)
+		{
+			return true;
+		}
+		else if (A.GetActorLocation().X < B.GetActorLocation().X)
+		{
+			return false;
+		}
+		else
+		{
+			return A.GetActorLocation().Y < B.GetActorLocation().Y;
+		}
+	});
+
+	float curX = 0.f;
+	if (m_BaseBlocks.Num() > 0)
+	{
+		curX = m_BaseBlocks[0]->GetActorLocation().X;
+	}
+
+	int xInx = 0;
+	int yInx = 0;
+	for (int i = 0; i < m_BaseBlocks.Num(); ++i)
+	{
+		ABaseBlock* block = m_BaseBlocks[i];
+
+		if (curX == block->GetActorLocation().X)
+		{
+			block->BlockCoordinate.X = xInx;
+			block->BlockCoordinate.Y = yInx;
+			yInx++;
+		}
+		else
+		{
+			xInx++;
+			yInx = 0;
+			block->BlockCoordinate.X = xInx;
+			block->BlockCoordinate.Y = yInx;
+			yInx++;
+			curX = block->GetActorLocation().X;
+		}
+	}
+
+
+#endif
 }

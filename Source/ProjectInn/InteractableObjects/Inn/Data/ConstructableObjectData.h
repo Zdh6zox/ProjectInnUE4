@@ -43,6 +43,7 @@ public:
 	{
 		return (lhs.Type == rhs.Type) && (lhs.Level == rhs.Level)
 			&& (lhs.Layer == rhs.Layer) && (lhs.SizeX == rhs.SizeX) && (lhs.SizeY == rhs.SizeY)
-			&& (lhs.OriginLocation == rhs.OriginLocation) && (lhs.DamageDegree == rhs.DamageDegree);
+			&& (lhs.OriginLocation.X == rhs.OriginLocation.X) && (lhs.OriginLocation.Y == rhs.OriginLocation.Y)
+			&& (lhs.DamageDegree == rhs.DamageDegree);
 	}
 };

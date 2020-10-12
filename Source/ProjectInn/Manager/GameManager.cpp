@@ -112,12 +112,12 @@ void AGameManager::Test_ClearCustomers()
 
 void AGameManager::Test_AddTable(FTableData tableData)
 {
-	m_InnManager.AddTableData(tableData);
+
 }
 
 void AGameManager::Test_ClearTable()
 {
-	m_InnManager.ClearCurrentTableData();
+
 }
 
 void AGameManager::Test_SaveGame(FString slotName)
@@ -127,7 +127,7 @@ void AGameManager::Test_SaveGame(FString slotName)
 
 UMaterial* AGameManager::Test_LoadFloorBlockMat(EFloorBlockMaterial mat)
 {
-	return m_InnManager.LoadFloorBlockAssetMat(mat);
+	return nullptr;
 }
 
 void AGameManager::Test_OrganizeBaseBlocks()
