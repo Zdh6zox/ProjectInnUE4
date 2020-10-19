@@ -52,6 +52,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnMouseFocusLeft_BP();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void ToggleCollision_BP(bool enable);
+
+	virtual void ToggleCollision(bool enable);
+
 private:
 	TSharedPtr<FTableRuntimeData> m_RuntimeData;
 };

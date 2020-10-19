@@ -129,24 +129,9 @@ void FInnManager::UpdateConstructMode()
 				//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
 			}
 		}
-		else if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+		else
 		{
-			ABaseBlock* endBaseBlock = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
-			if (m_EndBaseBlock != endBaseBlock)
-			{
-				if (m_EndBaseBlock != NULL && m_EndBaseBlock != m_StartBaseBlock)
-				{
-					m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Normal);
-				}
-
-				m_EndBaseBlock = endBaseBlock;
-				if (m_EndBaseBlock != NULL)
-				{
-					m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Selected);
-					//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
-					UpdateSelectedBaseBlock();
-				}
-			}
+			UpdateSelectedBaseBlock();
 		}
 	}
 	else if (controller->WasLeftBtnReleased())
@@ -157,9 +142,31 @@ void FInnManager::UpdateConstructMode()
 
 void FInnManager::UpdateSelectedBaseBlock()
 {
+	AProjectInnPlayerController* controller = Cast<AProjectInnPlayerController>(UGameplayStatics::GetPlayerController(m_GameManager.Get(), 0));
+	if (controller == NULL)
+	{
+		return;
+	}
+
 	//Update selected blocks via selected class
 	if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
 	{
+		ABaseBlock* endBaseBlock = Cast<ABaseBlock>(controller->GetObjectUnderCursor());
+		if (m_EndBaseBlock != endBaseBlock)
+		{
+			if (m_EndBaseBlock != NULL && m_EndBaseBlock != m_StartBaseBlock)
+			{
+				m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Normal);
+			}
+
+			m_EndBaseBlock = endBaseBlock;
+			if (m_EndBaseBlock != NULL)
+			{
+				m_EndBaseBlock->ChangeDisplayMode(ABaseBlock::Selected);
+				//m_CurrentSelectedBaseBlocks.AddUnique(blocksUnder);
+			}
+		}
+
 		for (int i = 0; i < m_CurrentSelectedBaseBlocks.Num(); ++i)
 		{
 			m_CurrentSelectedBaseBlocks[i]->ChangeDisplayMode(ABaseBlock::Normal);
@@ -225,6 +232,11 @@ void FInnManager::UpdateSelectedBaseBlock()
 			}
 		}
 	}
+	else if (m_CurrentSelectedClass->IsChildOf(ATable::StaticClass()))
+	{
+		m_CurrentSelectedBaseBlocks.Empty();
+		m_CurrentSelectedBaseBlocks.Add(m_StartBaseBlock);
+	}
 }
 
 void FInnManager::ResetSaveData()
@@ -280,6 +292,11 @@ void FInnManager::ExitConstructMode()
 	{
 		ABaseBlock* block = elem.Value;
 		block->ChangeDisplayMode(ABaseBlock::EBaseBlockDisplayMode::Transparent);
+	}
+
+	if (m_CurrentDisplayObject != NULL)
+	{
+		m_CurrentDisplayObject->Destroy();
 	}
 }
 

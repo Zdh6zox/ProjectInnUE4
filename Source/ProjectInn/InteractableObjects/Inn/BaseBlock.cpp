@@ -14,8 +14,13 @@ ABaseBlock::ABaseBlock()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	USceneComponent* rootComponent = CreateDefaultSubobject<USceneComponent>("Root");
+	rootComponent->Mobility = EComponentMobility::Static;
+	SetRootComponent(rootComponent);
+
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	StaticMesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

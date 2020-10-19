@@ -96,3 +96,8 @@ FTableData ATable::Test_CreateTableData()
 	newTableData.TableTransform = GetActorTransform();
 	return newTableData;
 }
+
+void ATable::ToggleCollision(bool enable)
+{
+	ToggleCollision_BP(enable);
+}
