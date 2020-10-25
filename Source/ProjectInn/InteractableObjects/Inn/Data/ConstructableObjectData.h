@@ -34,6 +34,9 @@ public:
 		int SizeY;
 
 	UPROPERTY(EditAnywhere)
+		EDirectionType Direction;
+
+	UPROPERTY(EditAnywhere)
 		FBlockCoordinate OriginLocation;
 
 	UPROPERTY(EditAnywhere)

@@ -23,7 +23,46 @@ enum class EConstructableObjectType : uint8
 	Door UMETA(DisplayName = "门"),
 	Decorate UMETA(DisplayName = "装饰"),
 	Table UMETA(DisplayName = "桌子"),
-	Stairs UMETA(DisplayName = "楼梯")
+	Stairs UMETA(DisplayName = "楼梯"),
+	Wall UMETA(DisplayName = "墙")
+};
+
+UENUM(BlueprintType)
+enum class EDirectionType : uint8
+{
+	Up,
+	Down,
+	Left,
+	Right
+};
+
+UENUM(BlueprintType)
+enum class EWallMaterialType : uint8
+{
+	Plank UMETA(DisplayName = "木地板"),
+	Granite UMETA(DisplayName = "青石板"),
+	Bamboo UMETA(DisplayName = "竹地板"),
+	Brick UMETA(DisplayName = "石砖"),
+	GoldenBrick UMETA(DisplayName = "金砖"),
+	Jade UMETA(DisplayName = "玉石")
+};
+
+UENUM(BlueprintType)
+enum class EFloorBlockLocationType : uint8
+{
+	Top,
+	Bottom,
+	Left,
+	Right,
+	TopLeftCorner,
+	TopRightCorner,
+	BottomLeftCorner,
+	BottomRightCorner,
+	TopMost,
+	BottomMost,
+	LeftMost,
+	RightMost,
+	None
 };
 
 UENUM(BlueprintType)

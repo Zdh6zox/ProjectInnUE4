@@ -53,12 +53,11 @@ public:
 
 private:
 	void UpdateSelectedBaseBlock();
+	void UpdateFloorBlocks();
 
 	TArray<ATable*> m_CurrentTables;
 	TWeakObjectPtr<AGameManager> m_GameManager;
 	UInnData* m_CurrentInnSaveData;
-	TSubclassOf<ATable> m_TableClass;
-	TSubclassOf<AFloorBlock> m_FloorBlockClass;
 	ACounter* m_Counter;
 	EInnManagerMode m_CurrentMode;
 
@@ -71,6 +70,8 @@ private:
 	AConstructableObject* m_CurrentDisplayObject;
 
 	TArray<AConstructableObject*> m_CurrentObjects;
+
+	TArray<AFloorBlock*> m_FloorBlocks;
 
 	UDataTable* m_AssetDataTable;
 

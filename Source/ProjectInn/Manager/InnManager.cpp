@@ -239,6 +239,14 @@ void FInnManager::UpdateSelectedBaseBlock()
 	}
 }
 
+void FInnManager::UpdateFloorBlocks()
+{
+	for (int i = 0; i < m_FloorBlocks.Num(); ++i)
+	{
+
+	}
+}
+
 void FInnManager::ResetSaveData()
 {
 	m_CurrentInnSaveData->ConditionalBeginDestroy();
@@ -317,6 +325,12 @@ void FInnManager::SpawnSelectedObject()
 			m_CurrentSelectedBaseBlocks[i]->ObjectsOnThisBlock.Add(spawnedObject);
 
 			m_CurrentObjects.Add(spawnedObject);
+
+			if (m_CurrentSelectedClass->IsChildOf(AFloorBlock::StaticClass()))
+			{
+				AFloorBlock* spawnedFloorBlock = Cast<AFloorBlock>(spawnedObject);
+				m_FloorBlocks.Add(spawnedFloorBlock);
+			}
 			//m_FloorBlockClass.Add(spawnedCustomer);
 		}
 	}

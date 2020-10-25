@@ -10,6 +10,8 @@
 /**
  * 
  */
+class AWall;
+
 UCLASS()
 class PROJECTINN_API AFloorBlock : public AConstructableObject
 {
@@ -24,10 +26,22 @@ public:
 	UPROPERTY(EditAnywhere)
 		int FloorLayer;
 
+	UPROPERTY(EditAnywhere)
+		EFloorBlockLocationType BlockLocationType = EFloorBlockLocationType::None;
+
 	UFUNCTION(BlueprintImplementableEvent)
 		void ToggleCollision_BP(bool enable);
+
+	void ConstructWall(int wallLevel);
 
 	void InitializeBlockWithMaterial(EFloorBlockMaterial matType);
 
 	virtual void ToggleCollision(bool enable);
+
+	UFUNCTION(BlueprintCallable)
+		void Test_ConstructWall(int level);
+public:
+
+	UPROPERTY()
+		TArray<AWall*> Walls;
 };
