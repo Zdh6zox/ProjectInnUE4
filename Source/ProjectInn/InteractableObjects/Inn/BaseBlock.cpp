@@ -20,7 +20,7 @@ ABaseBlock::ABaseBlock()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	StaticMesh->SetupAttachment(RootComponent);
+	StaticMesh->SetupAttachment(rootComponent);
 }
 
 // Called when the game starts or when spawned
